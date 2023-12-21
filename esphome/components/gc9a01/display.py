@@ -28,7 +28,7 @@ gc9a01_ns = cg.esphome_ns.namespace("gc9a01")
 #)
 
 SPIGC9A01 = gc9a01_ns.class_(
-    "GC9A01", display.DisplayBuffer, spi.SPIDevice, cg.PollingComponent
+    "GC9A01", display.DisplayBuffer, spi.SPIDevice
 )
 
 GC9A01_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
