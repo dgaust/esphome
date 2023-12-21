@@ -116,7 +116,7 @@ async def setup_display_core_(var, config):
 
 
 async def register_display(var, config):
-    await cg.register_component(var, config)
+    # await cg.register_component(var, config)
     await setup_display_core_(var, config)
 
 
