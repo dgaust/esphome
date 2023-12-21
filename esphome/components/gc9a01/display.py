@@ -23,15 +23,19 @@ CONF_OFFSET_Y = "offset_y"
 CONF_EIGHT_BIT_COLOR = "eight_bit_color"
 
 gc9a01_ns = cg.esphome_ns.namespace("gc9a01")
+#SPIGC9A01 = gc9a01_ns.class_(
+#    "GC9A01", cg.PollingComponent, display.DisplayBuffer, spi.SPIDevice
+#)
+
 SPIGC9A01 = gc9a01_ns.class_(
-    "GC9A01", cg.PollingComponent, display.DisplayBuffer, spi.SPIDevice
+    "GC9A01", display.DisplayBuffer, spi.SPIDevice, cg.PollingComponent
 )
 
 GC9A01_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
     {
         cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
     }
-).extend(cv.polling_component_schema("5s"))
+).extend(cv.polling_component_schema("1s"))
 
 CONFIG_SCHEMA = cv.All(
     GC9A01_SCHEMA.extend(
