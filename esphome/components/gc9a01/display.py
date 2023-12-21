@@ -53,7 +53,7 @@ CONFIG_SCHEMA = cv.All(
 
 async def setup_gc9a01(var, config):
     # await cg.register_component(var, config)
-    await display.register_display(var, config)
+    # await display.register_display(var, config)
 
     if CONF_RESET_PIN in config:
         reset = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
