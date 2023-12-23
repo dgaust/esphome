@@ -35,7 +35,7 @@ GC9A01_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
     {
         cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
     }
-).extend(cv.polling_component_schema("5s"))
+).extend(cv.polling_component_schema("1s"))
 
 CONFIG_SCHEMA = cv.All(
     GC9A01_SCHEMA.extend(
