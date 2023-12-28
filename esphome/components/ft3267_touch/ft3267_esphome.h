@@ -2,7 +2,7 @@
 #define FT3267_ESPHOME_H
 
 #include "esphome.h"
-#include "esphome/components/i2c/i2c.h"  // Include I2C component
+#include "esphome/components/i2c/i2c.h"
 
 namespace esphome {
 namespace ft3267 {
@@ -21,14 +21,17 @@ struct TouchData {
 
 class FT3267Component : public PollingComponent, public i2c::I2CDevice {
  public:
-  void set_interrupt_pin(int pin);
+  void set_interrupt_pin(int pin) { interrupt_pin_ = pin; }
   void setup() override;
   void update() override;
-  int get_touch_point_count() const;
+
+  // Method to retrieve the number of touch points
+  int get_touch_point_count() const { return touch_point_count_; }
 
  private:
-  int interrupt_pin_ = -1; // Default to -1 to indicate no pin assigned
-  void on_interrupt();
+  int interrupt_pin_ = -1;  // Interrupt pin
+  int touch_point_count_ = 0;  // Store the number of touch points
+
   TouchData read_touch_data();
   bool read_i2c(uint8_t reg, uint8_t *data, int len);
 };
