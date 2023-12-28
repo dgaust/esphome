@@ -96,6 +96,17 @@ void ft3267Touchscreen::setup() {
 
   this->hard_reset_();
 
+  this->write_byte(FT5x06_ID_G_THGROUP, 70);
+  this->write_byte(FT5x06_ID_G_THPEAK, 60);
+  this->write_byte(FT5x06_ID_G_THCAL, 16);
+  this->write_byte(FT5x06_ID_G_THWATER, 60);
+  this->write_byte(FT5x06_ID_G_THTEMP, 10);
+  this->write_byte(FT5x06_ID_G_THDIFF, 20);
+  this->write_byte(FT5x06_ID_G_TIME_ENTER_MONITOR, 2);
+  this->write_byte(FT5x06_ID_G_PERIODACTIVE, 12);
+  this->write_byte(FT5x06_ID_G_PERIODMONITOR, 40);
+  this->write_byte(FT5x06_ID_G_MODE, 0);
+
   // Get touch resolution
   this->x_raw_max_ = 240;
   this->y_raw_max_ = 240;
