@@ -24,6 +24,7 @@ class FT3267Component : public PollingComponent, public i2c::I2CDevice {
   void set_interrupt_pin(int pin);
   void setup() override;
   void update() override;
+  int get_touch_point_count() const;
 
  private:
   int interrupt_pin_ = -1; // Default to -1 to indicate no pin assigned

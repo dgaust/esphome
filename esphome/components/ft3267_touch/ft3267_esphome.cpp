@@ -12,6 +12,13 @@ void FT3267Component::setup() {
   // Setup code, including interrupt pin setup
 }
 
+int FT3267Component::get_touch_point_count() const {
+  // Implementation to retrieve the number of touch points
+  // This should return an integer representing the number of touch points detected
+  // Example (you need to replace this with actual logic to get touch points):
+  return touch_data.touch_count;
+}
+
 void FT3267Component::update() {
   TouchData data = this->read_touch_data();
   // Process touch data
