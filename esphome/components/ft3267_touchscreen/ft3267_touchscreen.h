@@ -5,7 +5,7 @@
 #include "esphome/components/i2c/i2c.h"
 
 
-class FT3267Touchscreen : public PollingComponent, public i2c::I2CDevice {
+class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice {
  private:
   gpio::GPIOPin *interrupt_pin_;
   // Define other necessary private variables and methods
