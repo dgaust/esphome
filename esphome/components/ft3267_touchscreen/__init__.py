@@ -19,8 +19,8 @@ CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend({
 
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    yield cg.register_component(var, config)
-    yield i2c.register_i2c_device(var, config)
+    await cg.register_component(var, config)
+    await i2c.register_i2c_device(var, config)
 
     # Set the I2C address if it's provided
     if CONF_ADDRESS in config:
