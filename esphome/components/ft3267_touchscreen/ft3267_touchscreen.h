@@ -3,7 +3,7 @@
 
 #include "esphome.h"
 #include "esphome/components/i2c/i2c.h"
-#include "esphome/components/gpio/binary_sensor.h"
+
 
 class FT3267Touchscreen : public PollingComponent, public i2c::I2CDevice {
  private:
