@@ -1,20 +1,35 @@
 import esphome.codegen as cg
-from esphome import core
-from . import touchscreen
+import esphome.config_validation as cv
 
-# Register the component with ESPHome
-cg.register_component("ft3267", touchscreen.FT3267Component)
+from esphome import pins
+from esphome.components import i2c, touchscreen
+from esphome.const import CONF_INTERRUPT_PIN, CONF_ID
 
-# Link to the FT3267 touchscreen C++ code
-FT3267_TOUCH_COMPONENT_SCHEMA = touchscreen.CONFIG_SCHEMA.extend({
-    # Add any additional configuration options here if needed
-})
 
-# Setup function for FT3267
-def setup_ft3267_touch(config):
+CODEOWNERS = ["@dgaust"]
+DEPENDENCIES = ["i2c"]
+
+ft3267_ns = cg.esphome_ns.namespace("ft3267")
+
+
+ft3267Touchscreen = ft3267_ns.class_(
+    "ft3267Touchscreen",
+    touchscreen.Touchscreen,
+    i2c.I2CDevice,
+)
+
+CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend(
+    {
+        cv.GenerateID(): cv.declare_id(ft3267Touchscreen),
+        cv.Optional(CONF_INTERRUPT_PIN): pins.internal_gpio_input_pin_schema,
+    }
+).extend(i2c.i2c_device_schema(0x5D))
+
+
+async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    yield cg.register_component(var, config)
-    yield touchscreen.register_touchscreen(var, config)
+    await touchscreen.register_touchscreen(var, config)
+    await i2c.register_i2c_device(var, config)
 
-# Registering the component with ESPHome core
-core.register_platform("i2c", "ft3267_touch", FT3267_TOUCH_COMPONENT_SCHEMA, setup_ft3267_touch)
+    if interrupt_pin := config.get(CONF_INTERRUPT_PIN):
+        cg.add(var.set_interrupt_pin(await cg.gpio_pin_expression(interrupt_pin)))

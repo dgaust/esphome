@@ -1,37 +1,25 @@
-#include "esphome.h"
+#pragma once
+
+#include "esphome/components/i2c/i2c.h"
+#include "esphome/components/touchscreen/touchscreen.h"
+#include "esphome/core/component.h"
+#include "esphome/core/hal.h"
 
 namespace esphome {
 namespace ft3267 {
 
-struct TouchPoint {
-  uint16_t x; // X coordinate
-  uint16_t y; // Y coordinate
-  uint8_t weight; // Touch weight (pressure)
-  uint8_t event; // Touch event type (e.g., down, up, contact)
-};
-
-struct TouchData {
-  uint8_t touch_count; // Number of touch points
-  TouchPoint points[10]; // Array of touch points, assuming a maximum of 10 touch points
-};
-
-class FT3267Component : public PollingComponent {
+class ft3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice {
  public:
-  void set_interrupt_pin(int pin);
-
   void setup() override;
-  void update() override;
+  void dump_config() override;
 
- private:
-  int interrupt_pin_ = -1;  // Default to -1 to indicate no pin assigned
+  void set_interrupt_pin(InternalGPIOPin *pin) { this->interrupt_pin_ = pin; }
+  
+ protected:
+  void update_touches() override;
 
-  void on_interrupt();
-  TouchData read_touch_data();
-
-  bool read_i2c(uint8_t reg, uint8_t *data, int len);
-
-  // Additional private methods or member variables
+  InternalGPIOPin *interrupt_pin_{};
 };
 
 }  // namespace ft3267
-}  // namespace esphome
+}  /

@@ -1,83 +1,112 @@
-#include "esphome.h"
+#include "ft3267_esphome.h"
+
+#include "esphome/core/helpers.h"
+#include "esphome/core/log.h"
 
 namespace esphome {
 namespace ft3267 {
 
-static const char *TAG = "ft3267.touch_controller";
+static const char *const TAG = "ft3267.touchscreen";
 
-struct TouchPoint {
-  uint16_t x; // X coordinate
-  uint16_t y; // Y coordinate
-  uint8_t weight; // Touch weight (pressure)
-  uint8_t event; // Touch event type (e.g., down, up, contact)
-};
+static const uint8_t GET_TOUCH_STATE[2] = {0x81, 0x4E};
+static const uint8_t CLEAR_TOUCH_STATE[3] = {0x81, 0x4E, 0x00};
+static const uint8_t GET_TOUCHES[2] = {0x81, 0x4F};
+static const uint8_t GET_SWITCHES[2] = {0x80, 0x4D};
+static const uint8_t GET_MAX_VALUES[2] = {0x80, 0x48};
+static const size_t MAX_TOUCHES = 5;  // max number of possible touches reported
 
-struct TouchData {
-  uint8_t touch_count; // Number of touch points
-  TouchPoint points[10]; // Array of touch points, assuming a maximum of 10 touch points
-};
-
-class FT3267Component : public PollingComponent {
- public:
-  void set_interrupt_pin(int pin) {
-    interrupt_pin_ = pin;
+#define ERROR_CHECK(err) \
+  if ((err) != i2c::ERROR_OK) { \
+    ESP_LOGE(TAG, "Failed to communicate!"); \
+    this->status_set_warning(); \
+    return; \
   }
 
-  void setup() override {
-    ESP_LOGCONFIG(TAG, "Setting up FT3267...");
-    if (interrupt_pin_ != -1) {
-      pinMode(interrupt_pin_, INPUT);
-      attachInterrupt(digitalPinToInterrupt(interrupt_pin_), std::bind(&FT3267Component::on_interrupt, this), FALLING);
+void ft3267Touchscreen::setup() {
+  i2c::ErrorCode err;
+  ESP_LOGCONFIG(TAG, "Setting up GT911 Touchscreen...");
+
+  // check the configuration of the int line.
+  uint8_t data[4];
+  err = this->write(GET_SWITCHES, 2);
+  if (err == i2c::ERROR_OK) {
+    err = this->read(data, 1);
+    if (err == i2c::ERROR_OK) {
+      ESP_LOGD(TAG, "Read from switches: 0x%02X", data[0]);
+      if (this->interrupt_pin_ != nullptr) {
+        // datasheet says NOT to use pullup/down on the int line.
+        this->interrupt_pin_->pin_mode(gpio::FLAG_INPUT);
+        this->interrupt_pin_->setup();
+        this->attach_interrupt_(this->interrupt_pin_,
+                                (data[0] & 1) ? gpio::INTERRUPT_FALLING_EDGE : gpio::INTERRUPT_RISING_EDGE);
+      }
     }
-
-    // Other initialization code here, like setting up I2C
   }
-
-  void update() override {
-    TouchData data = read_touch_data();
-    // Process and use the data as needed
-  }
-
-  void on_interrupt() {
-    // Handle the interrupt
-    // Read touch data or set a flag to read it in the update() method
-  }
-
-  TouchData read_touch_data() {
-    TouchData data;
-    // Assuming FT5x06_TOUCH_POINTS holds the number of touch points
-    uint8_t touch_points;
-    read_i2c(FT5x06_TOUCH_POINTS, &touch_points, 1);
-    data.touch_count = touch_points & 0x0F; // Extracting the number of touch points
-
-    for (int i = 0; i < data.touch_count; ++i) {
-      uint8_t buf[6]; // Buffer to hold touch data for each point
-      // Read the touch data for each point. Adjust the register address as per the touch point
-      read_i2c(FT5x06_TOUCH1_XH + i * 6, buf, 6);
-
-      // Extracting X and Y coordinates
-      data.points[i].x = ((uint16_t)(buf[0] & 0x0F) << 8) | buf[1];
-      data.points[i].y = ((uint16_t)(buf[2] & 0x0F) << 8) | buf[3];
-
-      // Extracting additional information like touch event, weight, etc., if available
-      // Example:
-      // data.points[i].event = buf[0] >> 6;
-      // data.points[i].weight = buf[4];
+  if (err == i2c::ERROR_OK) {
+    err = this->write(GET_MAX_VALUES, 2);
+    if (err == i2c::ERROR_OK) {
+      err = this->read(data, sizeof(data));
+      if (err == i2c::ERROR_OK) {
+        this->x_raw_max_ = encode_uint16(data[1], data[0]);
+        this->y_raw_max_ = encode_uint16(data[3], data[2]);
+        esph_log_d(TAG, "Read max_x/max_y %d/%d", this->x_raw_max_, this->y_raw_max_);
+      }
     }
-
-    return data;
+  }
+  if (err != i2c::ERROR_OK) {
+    ESP_LOGE(TAG, "Failed to communicate!");
+    this->mark_failed();
+    return;
   }
 
- private:
-  int interrupt_pin_ = -1;  // Default to -1 to indicate no pin assigned
+  ESP_LOGCONFIG(TAG, "GT911 Touchscreen setup complete");
+}
 
-  bool read_i2c(uint8_t reg, uint8_t *data, int len) {
-    // Implement the I2C read function
-    return i2c::I2CComponent::read_bytes(reg, data, len);
+void ft3267Touchscreen::update_touches() {
+  i2c::ErrorCode err;
+  uint8_t touch_state = 0;
+  uint8_t data[MAX_TOUCHES + 1][8];  // 8 bytes each for each point, plus extra space for the key byte
+
+  err = this->write(GET_TOUCH_STATE, sizeof(GET_TOUCH_STATE), false);
+  ERROR_CHECK(err);
+  err = this->read(&touch_state, 1);
+  ERROR_CHECK(err);
+  this->write(CLEAR_TOUCH_STATE, sizeof(CLEAR_TOUCH_STATE));
+  uint8_t num_of_touches = touch_state & 0x07;
+
+  if ((touch_state & 0x80) == 0 || num_of_touches > MAX_TOUCHES) {
+    this->skip_update_ = true;  // skip send touch events, touchscreen is not ready yet.
+    return;
   }
 
-  // Additional private methods or member variables
-};
+  if (num_of_touches == 0)
+    return;
+
+  err = this->write(GET_TOUCHES, sizeof(GET_TOUCHES), false);
+  ERROR_CHECK(err);
+  // num_of_touches is guaranteed to be 0..5. Also read the key data
+  err = this->read(data[0], sizeof(data[0]) * num_of_touches + 1);
+  ERROR_CHECK(err);
+
+  for (uint8_t i = 0; i != num_of_touches; i++) {
+    uint16_t id = data[i][0];
+    uint16_t x = encode_uint16(data[i][2], data[i][1]);
+    uint16_t y = encode_uint16(data[i][4], data[i][3]);
+    this->add_raw_touch_position_(id, x, y);
+  }
+  auto keys = data[num_of_touches][0];
+  for (size_t i = 0; i != 4; i++) {
+    for (auto *listener : this->button_listeners_)
+      listener->update_button(i, (keys & (1 << i)) != 0);
+  }
+}
+
+void ft3267Touchscreen::dump_config() {
+  ESP_LOGCONFIG(TAG, "ft3267 Touchscreen:");
+  LOG_I2C_DEVICE(this);
+  LOG_PIN("  Interrupt Pin: ", this->interrupt_pin_);
+}
 
 }  // namespace ft3267
 }  // namespace esphome
+
