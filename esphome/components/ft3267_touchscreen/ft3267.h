@@ -8,7 +8,7 @@
 #pragma once
 
 #include "esphome/components/i2c/i2c.h"
-#include "esphome/components/touchscreen/touchscreen.h"
+#include "touchscreen.h"
 #include "esphome/core/component.h"
 
 namespace esphome {
