@@ -11,7 +11,8 @@ FT3267Component = ft3267_ns.class_('FT3267Component', cg.PollingComponent, i2c.I
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(FT3267Component),
     cv.Optional(CONF_UPDATE_INTERVAL): cv.update_interval,
-    # Add other configuration parameters here
+    cv.Optional(CONF_INTERRUPT_PIN): cv.pin,  # Define the interrupt pin
+    # ... other configurations ...
 }).extend(cv.COMPONENT_SCHEMA).extend(i2c.i2c_device_schema(0x38))
 
 def register_touchscreen(var, config):
