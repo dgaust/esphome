@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import i2c
-from esphome.const import CONF_ID
+from esphome.components import i2c, gpio
+from esphome.const import CONF_ID, CONF_ADDRESS, CONF_INTERRUPT_PIN
 
 DEPENDENCIES = ['i2c']
 
@@ -10,10 +10,21 @@ FT3267Touchscreen = ft3267_ns.class_('FT3267Touchscreen', cg.PollingComponent, i
 
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(FT3267Touchscreen),
-    # Here you can add configuration options, like I2C address, update interval, etc.
+    cv.Optional(CONF_ADDRESS, default=0x38): cv.i2c_address,
+    cv.Required(CONF_INTERRUPT_PIN): gpio.gpio_pin_schema,
+    # Add other configuration options here if needed
 }).extend(cv.polling_component_schema('60s')).extend(i2c.i2c_device_schema(0x38))
 
 def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
     yield i2c.register_i2c_device(var, config)
+
+    # Set the I2C address if it's provided
+    if CONF_ADDRESS in config:
+        cg.add(var.set_address(config[CONF_ADDRESS]))
+
+    # Configure the interrupt pin
+    interrupt_pin = yield gpio.gpio_pin_expression(config[CONF_INTERRUPT_PIN])
+    cg.add(var.set_interrupt_pin(interrupt_pin))
+
