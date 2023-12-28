@@ -28,8 +28,18 @@ TouchData FT3267Component::read_touch_data() {
 }
 
 bool FT3267Component::read_i2c(uint8_t reg, uint8_t *data, int len) {
-  // Implement I2C read functionality
-  return this->write_then_read(&reg, 1, data, len);
+  // First, write the register address you want to read from
+  if (!this->write_to_i2c_device(reg, &reg, 1, true)) {
+    ESP_LOGE("ft3267", "Failed to write to I2C device at register 0x%02X", reg);
+    return false;
+  }
+
+  // Then, read the data from the register
+  if (!this->read_from_i2c_device(reg, data, len, true)) {
+    ESP_LOGE("ft3267", "Failed to read from I2C device at register 0x%02X", reg);
+    return false;
+  }
+  return true;
 }
 
 }  // namespace ft3267
