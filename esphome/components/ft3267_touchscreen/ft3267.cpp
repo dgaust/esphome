@@ -94,6 +94,7 @@ uint16_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
 
 ft3267_gesture_t ft3267Touchscreen::read_touch_gesture_(uint8_t coordinate) {
   uint8_t read_buf[2];
+  ESP_LOGD("FT3267","Reading gestures");
   read_buf[0] = this->read_byte_(coordinate);
   read_buf[1] = this->read_byte_(coordinate + 1);
   return ft3267_gesture_zoom_out;
