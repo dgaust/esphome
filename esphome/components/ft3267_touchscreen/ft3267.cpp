@@ -23,10 +23,10 @@ static const uint8_t FT63X6_ADDR_TOUCH2_ID = 0x0B;
 static const uint8_t FT63X6_ADDR_TOUCH2_X = 0x09;
 static const uint8_t FT63X6_ADDR_TOUCH2_Y = 0x0B;
 
-static const char *const TAG = "FT63X6Touchscreen";
+static const char *const TAG = "ft3267Touchscreen";
 
 void ft3267Touchscreen::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up FT63X6Touchscreen Touchscreen...");
+  ESP_LOGCONFIG(TAG, "Setting up FT3267Touchscreen Touchscreen...");
   if (this->interrupt_pin_ != nullptr) {
     this->interrupt_pin_->pin_mode(gpio::FLAG_INPUT | gpio::FLAG_PULLUP);
     this->interrupt_pin_->setup();
