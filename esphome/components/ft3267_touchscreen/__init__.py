@@ -5,11 +5,12 @@ from esphome.components import i2c, gpio, touchscreen
 from esphome.const import CONF_ID, CONF_ADDRESS, CONF_INTERRUPT_PIN
 
 DEPENDENCIES = ['i2c']
+CODEOWNERS = ["@dgaust"]
 
 ft3267_ns = cg.esphome_ns.namespace('ft3267')
 FT3267Touchscreen = ft3267_ns.class_('FT3267Touchscreen', cg.PollingComponent, i2c.I2CDevice)
 
-CONFIG_SCHEMA = cv.touchscreen.TOUCHSCREEN_SCHEMA.extend({
+CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend({
     cv.GenerateID(): cv.declare_id(FT3267Touchscreen),
     cv.Optional(CONF_ADDRESS, default=0x38): cv.i2c_address,
     cv.Optional(CONF_INTERRUPT_PIN): pins.internal_gpio_input_pin_schema,
