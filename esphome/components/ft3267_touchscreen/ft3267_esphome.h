@@ -1,33 +1,39 @@
 #ifndef FT3267_TOUCHSCREEN_H
 #define FT3267_TOUCHSCREEN_H
 
-#include "esphome/core/component.h"
+#include "esphome.h"
 #include "esphome/components/i2c/i2c.h"
+#include "esphome/components/gpio/binary_sensor.h"
 
-namespace esphome {
-namespace ft3267 {
+class FT3267Touchscreen : public PollingComponent, public i2c::I2CDevice {
+ private:
+  gpio::GPIOPin *interrupt_pin_;
+  // Define other necessary private variables and methods
 
-struct TouchPoint {
-  uint16_t x;
-  uint16_t y;
-};
-
-class FT3267TouchscreenComponent : public PollingComponent, public i2c::I2CDevice {
  public:
-  void set_address(uint8_t address) { address_ = address; }
-  void setup() override;
-  void update() override;
-  void dump_config() override;
-  float get_setup_priority() const override { return setup_priority::DATA; }
+  FT3267Touchscreen(i2c::I2CDevice *i2c_device, gpio::GPIOPin *interrupt_pin, uint32_t update_interval)
+      : i2c::I2CDevice(i2c_device), PollingComponent(update_interval), interrupt_pin_(interrupt_pin) {}
 
-  std::vector<TouchPoint> get_touch_points() const { return touch_points_; }
+  void setup() override {
+    // Initialization code for I2C
+    this->begin();
+    // Initialize GPIO pin for interrupt
+    this->interrupt_pin_->setup();
+    this->interrupt_pin_->attach_interrupt(FT3267Touchscreen::on_touch_interrupt, this, CHANGE);
+    // Additional setup for FT3267
+  }
 
- protected:
-  uint8_t address_;
-  std::vector<TouchPoint> touch_points_;
+  void update() override {
+    // Code to periodically read touch data or status
+    // This might be empty if all handling is done via interrupts
+  }
+
+  static void on_touch_interrupt(FT3267Touchscreen *instance) {
+    // Handle the touch interrupt
+    // Read and process touch data from FT3267
+  }
+
+  // Additional public methods as necessary
 };
 
-}  // namespace ft3267
-}  // namespace esphome
-
-#endif  // FT3267_TOUCHSCREEN_H
+#endif // FT3267_TOUCHSCREEN_H
