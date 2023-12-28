@@ -7,6 +7,7 @@
 
 #include "ft3267.h"
 #include "esphome/core/log.h"
+#include "Wire.h"
 
 // Registers
 // Reference: https://focuslcds.com/content/FT6236.pdf
@@ -49,6 +50,7 @@ void ft3267Touchscreen::setup() {
 void ft3267Touchscreen::update_touches() {
   
   int touch_count = this->read_touch_count_();
+  
   if (touch_count == 0) {
     return;
   }
@@ -57,6 +59,7 @@ void ft3267Touchscreen::update_touches() {
   uint8_t gesture_id= this->test_gesture_();
   int16_t x = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_X);
   int16_t y = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_Y);
+ 
   ESP_LOGD("FT3267", "Gesture ID: %d", gesture_id);
   this->add_raw_touch_position_(touch_id, x, y);
   ESP_LOGD("FT3267", "Touch %d detected at x: %d, y and gesture id %d: %d", touch_id, x, y, gesture_id);
