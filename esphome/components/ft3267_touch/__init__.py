@@ -3,6 +3,9 @@ from esphome import core
 from . import touchscreen
 from esphome.const import CONF_ID
 
+CODEOWNERS = ["@dgaust"]
+DEPENDENCIES = ["i2c"]
+
 ft3267_ns = cg.esphome_ns.namespace('ft3267')
 FT3267Component = ft3267_ns.class_('FT3267Component', cg.PollingComponent)
 
