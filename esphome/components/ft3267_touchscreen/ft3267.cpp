@@ -96,7 +96,7 @@ uint16_t ft3267Touchscreen::read_touch_gesture_(uint8_t coordinate) {
   uint8_t read_buf[2];
   read_buf[0] = this->read_byte_(coordinate);
   // read_buf[1] = this->read_byte_(coordinate + 1);
-  ESP_LOGD("FT3267","Reading gestures");
+  ESP_LOGD("FT3267","Gesture: %d", coordinate);
   return read_buf[0];
 }
 
