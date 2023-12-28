@@ -167,7 +167,8 @@ uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
 
 uint8_t ft3267Touchscreen::gesture_read_byte_(uint8_t reg_addr) {
   uint8_t byte = 0;
-  this->read_byte(reg_addr);
+  // this->read_byte(reg_addr);
+  byte = this->read_byte(reg_addr);
   return byte;
 }
 
