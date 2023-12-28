@@ -11,8 +11,8 @@ class FT3267Touchscreen : public PollingComponent, public i2c::I2CDevice {
   // Define other necessary private variables and methods
 
  public:
-  FT3267Touchscreen(i2c::I2CDevice *i2c_device, gpio::GPIOPin *interrupt_pin, uint32_t update_interval)
-      : i2c::I2CDevice(i2c_device), PollingComponent(update_interval), interrupt_pin_(interrupt_pin) {}
+ // FT3267Touchscreen(i2c::I2CDevice *i2c_device, gpio::GPIOPin *interrupt_pin, uint32_t update_interval)
+ //    : i2c::I2CDevice(i2c_device), PollingComponent(update_interval), interrupt_pin_(interrupt_pin) {}
 
   void setup() override {
     // Initialization code for I2C
