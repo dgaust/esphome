@@ -15,9 +15,9 @@ namespace ft3267 {
 
 static const uint8_t FT3267_ADDR_TOUCH_COUNT = 0x02;
 static const uint8_t FT3267_ADDR_TOUCH1_ID = 0x05;
-static const uint8_t FT3267_ADDR_TOUCH1_X = 0x04;
-static const uint8_t FT3267_ADDR_TOUCH1_Y = 0x06;
-static const uint8_t FT3267_ADDR_TOUCH2_ID = 0x0B;
+static const uint8_t FT3267_ADDR_TOUCH1_X = 0x03;
+static const uint8_t FT3267_ADDR_TOUCH1_Y = 0x05;
+static const uint8_t FT3267_ADDR_TOUCH2_ID = 0x09;
 static const uint8_t FT3267_ADDR_TOUCH2_X = 0x09;
 static const uint8_t FT3267_ADDR_TOUCH2_Y = 0x0B;
 static const uint8_t FT3267_GESTUREID = 0x01;
