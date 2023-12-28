@@ -94,11 +94,8 @@ void ft3267Touchscreen::update_touches() {
     uint16_t y = encode_uint16(data[i][4], data[i][3]);
     this->add_raw_touch_position_(id, x, y);
   }
-  auto keys = data[num_of_touches][0];
-  for (size_t i = 0; i != 4; i++) {
-    for (auto *listener : this->button_listeners_)
-      listener->update_button(i, (keys & (1 << i)) != 0);
-  }
+
+  
 }
 
 void ft3267Touchscreen::dump_config() {
