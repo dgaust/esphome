@@ -153,7 +153,14 @@ void ft3267Touchscreen::dump_config() {
   LOG_PIN("  Reset Pin: ", this->reset_pin_);
 }
 
-uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_ADDR_TOUCH_COUNT); }
+uint8_t ft3267Touchscreen::read_touch_count_() { 
+  // return this->read_byte_(FT3267_ADDR_TOUCH_COUNT); 
+  esphome::optional<uint8_t> optional_value = this->read_byte(FT3267_ADDR_TOUCH_COUNT);
+  if (optional_value)
+    return *optional_value;
+  else
+    return 0;
+}
 
 uint8_t ft3267Touchscreen::test_gesture_() { return this->read_byte_(FT3267_GESTUREID); }
 // Touch functions
