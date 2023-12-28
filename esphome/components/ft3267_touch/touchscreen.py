@@ -16,3 +16,4 @@ CONFIG_SCHEMA = cv.Schema({
 
 def register_touchscreen(var, config):
     # Function to register touchscreen component
+    pass  # Placeholder for future code
