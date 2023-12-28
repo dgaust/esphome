@@ -83,6 +83,7 @@ static const char *const TAG = "ft3267Touchscreen";
 
 void ft3267Touchscreen::setup() {
   ESP_LOGCONFIG(TAG, "Setting up FT3267Touchscreen Touchscreen...");
+  
   if (this->interrupt_pin_ != nullptr) {
     this->interrupt_pin_->pin_mode(gpio::FLAG_INPUT | gpio::FLAG_PULLUP);
     this->interrupt_pin_->setup();
@@ -110,7 +111,7 @@ void ft3267Touchscreen::update_touches() {
   }
 
   uint8_t touch_id = this->read_touch_id_(FT3267_ADDR_TOUCH1_ID);  // id1 = 0 or 1
-  uint8_t gesture_id= this->test_gesture_();
+  uint8_t gesture_id= this->read_touch_gesture_(FT3267_GESTUREID);
   int16_t x = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_X);
   int16_t y = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_Y);
  
@@ -153,11 +154,7 @@ uint16_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
 }
 
 uint16_t ft3267Touchscreen::read_touch_gesture_(uint8_t coordinate) {
-  uint8_t read_buf[2];
-  read_buf[0] = this->read_byte_(coordinate);
-  read_buf[1] = this->read_byte_(coordinate + 1);
-  ESP_LOGD("FT3267","Gesture: %d", coordinate);
-  return ((read_buf[0] & 0x0f) << 8) | read_buf[1];
+  return gesture_read_byte_(FT5x06_GESTURE_ID);
 }
 
 uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->read_byte_(id_address) >> 4; }
@@ -165,6 +162,12 @@ uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->rea
 uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
   uint8_t byte = 0;
   this->read_byte(addr, &byte);
+  return byte;
+}
+
+uint8_t ft3267Touchscreen::gesture_read_byte_(uint8_t reg_addr) {
+  uint8_t byte = 0;
+  this->read_byte(reg_addr);
   return byte;
 }
 
