@@ -21,6 +21,7 @@ static const uint8_t FT3267_ADDR_TOUCH2_ID = 0x0B;
 static const uint8_t FT3267_ADDR_TOUCH2_X = 0x09;
 static const uint8_t FT3267_ADDR_TOUCH2_Y = 0x0B;
 static const uint8_t FT3267_GESTUREID = 0x01;
+static const uint8_t FT3267_ADDR = 0x51;
 static const char *const TAG = "ft3267Touchscreen";
 
 #define FT5x06_ADDR                    (0x38)
@@ -163,6 +164,7 @@ uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->rea
 
 uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
   uint8_t byte = 0;
+  this->write_byte(FT3267_ADDR, FT5x06_GESTURE_ID);
   this->read_byte(addr, &byte);
   return byte;
 }
