@@ -14,6 +14,16 @@
 namespace esphome {
 namespace ft3267 {
 
+typedef enum {
+  ft3267_gesture_none = 0x00,
+  ft3267_gesture_move_up = 0x10,
+  ft3267_gesture_move_left = 0x14,
+  ft3267_gesture_move_down = 0x18,
+  ft3267_gesture_move_right = 0x1c,
+  ft3267_gesture_zoom_in = 0x48,
+  ft3267_gesture_zoom_out = 0x49,
+} ft3267_gesture_t;
+
 using namespace touchscreen;
 
 class ft3267Touchscreen : public Touchscreen, public i2c::I2CDevice {
@@ -35,6 +45,8 @@ class ft3267Touchscreen : public Touchscreen, public i2c::I2CDevice {
   uint8_t read_touch_count_();
   uint16_t read_touch_coordinate_(uint8_t coordinate);
   uint8_t read_touch_id_(uint8_t id_address);
+  ft3267_gesture_t t3267_read_gesture_(uint8_t coordinate);
+
 };
 
 }  // namespace ft3267
