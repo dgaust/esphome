@@ -4,6 +4,7 @@ from esphome.components import i2c
 from esphome.const import CONF_ID, CONF_UPDATE_INTERVAL
 
 DEPENDENCIES = ['i2c']
+CONF_INTERRUPT_PIN = 'interrupt_pin'
 
 ft3267_ns = cg.esphome_ns.namespace('ft3267')
 FT3267Component = ft3267_ns.class_('FT3267Component', cg.PollingComponent, i2c.I2CDevice)
