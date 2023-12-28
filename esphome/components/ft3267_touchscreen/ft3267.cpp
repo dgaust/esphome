@@ -112,8 +112,8 @@ void ft3267Touchscreen::update_touches() {
 
   uint8_t touch_id = this->read_touch_id_(FT3267_ADDR_TOUCH1_ID);  // id1 = 0 or 1
   uint8_t gesture_id= this->read_touch_gesture_(FT3267_GESTUREID);
-  int16_t x = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_X);
-  int16_t y = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_Y);
+  uint8_t x = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_X);
+  uint8_t y = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_Y);
  
   ESP_LOGD("FT3267", "Gesture ID: %d", gesture_id);
   this->add_raw_touch_position_(touch_id, x, y);
@@ -146,14 +146,14 @@ uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_
 
 uint8_t ft3267Touchscreen::test_gesture_() { return this->read_byte_(FT3267_GESTUREID); }
 // Touch functions
-uint16_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
+uint8_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
   uint8_t read_buf[2];
   read_buf[0] = this->read_byte_(coordinate);
   read_buf[1] = this->read_byte_(coordinate + 1);
   return ((read_buf[0] & 0x0f) << 8) | read_buf[1];
 }
 
-uint16_t ft3267Touchscreen::read_touch_gesture_(uint8_t coordinate) {
+uint8_t ft3267Touchscreen::read_touch_gesture_(uint8_t coordinate) {
   return gesture_read_byte_(FT5x06_GESTURE_ID);
 }
 
