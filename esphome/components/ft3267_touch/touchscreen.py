@@ -17,6 +17,14 @@ CONFIG_SCHEMA = cv.Schema({
     # ... other configurations ...
 }).extend(cv.COMPONENT_SCHEMA).extend(i2c.i2c_device_schema(0x38))
 
+async def to_code(config):
+    var = cg.new_Pvariable(config[CONF_ID])
+    await touchscreen.register_touchscreen(var, config)
+    await i2c.register_i2c_device(var, config)
+
+    if interrupt_pin := config.get(CONF_INTERRUPT_PIN):
+        cg.add(var.set_interrupt_pin(await cg.gpio_pin_expression(interrupt_pin)))
+
 def register_touchscreen(var, config):
     # Function to register touchscreen component
     pass  # Placeholder for future code

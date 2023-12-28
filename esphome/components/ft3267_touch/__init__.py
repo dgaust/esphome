@@ -1,6 +1,7 @@
 import esphome.codegen as cg
 from esphome import core
 from . import touchscreen
+from esphome.const import CONF_ID
 
 ft3267_ns = cg.esphome_ns.namespace('ft3267')
 FT3267Component = ft3267_ns.class_('FT3267Component', cg.PollingComponent)
