@@ -1,4 +1,5 @@
 #include "esphome.h"
+#include "esphome/components/i2c/i2c.h"  // Include I2C component
 
 namespace esphome {
 namespace ft3267 {
