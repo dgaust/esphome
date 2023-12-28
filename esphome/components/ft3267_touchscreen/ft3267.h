@@ -45,7 +45,7 @@ class ft3267Touchscreen : public Touchscreen, public i2c::I2CDevice {
   uint8_t read_touch_count_();
   uint16_t read_touch_coordinate_(uint8_t coordinate);
   uint8_t read_touch_id_(uint8_t id_address);
-  ft3267_gesture_t read_touch_gesture_(uint8_t coordinate)
+  ft3267_gesture_t read_touch_gesture_(uint8_t coordinate);
 
 };
 
