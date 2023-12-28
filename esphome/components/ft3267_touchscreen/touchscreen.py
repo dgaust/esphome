@@ -9,7 +9,7 @@ CODEOWNERS = ["@dgaust"]
 DEPENDENCIES = ["i2c"]
 
 ft3267_ns = cg.esphome_ns.namespace("ft3267")
-ft3267Touchscreen = ft6336u_ns.class_(
+ft3267Touchscreen = ft3267_ns.class_(
     "ft3267Touchscreen",
     touchscreen.Touchscreen,
     i2c.I2CDevice,
