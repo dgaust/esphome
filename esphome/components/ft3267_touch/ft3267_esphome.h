@@ -1,3 +1,6 @@
+#ifndef FT3267_ESPHOME_H
+#define FT3267_ESPHOME_H
+
 #include "esphome.h"
 #include "esphome/components/i2c/i2c.h"  // Include I2C component
 
@@ -31,3 +34,5 @@ class FT3267Component : public PollingComponent, public i2c::I2CDevice {
 
 }  // namespace ft3267
 }  // namespace esphome
+
+#endif  // FT3267_ESPHOME_H
