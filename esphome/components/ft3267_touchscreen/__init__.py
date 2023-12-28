@@ -17,7 +17,7 @@ CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend({
     # Add other configuration options here if needed
 }).extend(cv.polling_component_schema('60s')).extend(i2c.i2c_device_schema(0x38))
 
-def to_code(config):
+async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
     yield i2c.register_i2c_device(var, config)
@@ -27,6 +27,7 @@ def to_code(config):
         cg.add(var.set_address(config[CONF_ADDRESS]))
 
     # Configure the interrupt pin
-    interrupt_pin = yield gpio.gpio_pin_expression(config[CONF_INTERRUPT_PIN])
-    cg.add(var.set_interrupt_pin(interrupt_pin))
+    if interrupt_pin := config.get(CONF_INTERRUPT_PIN):
+        cg.add(var.set_interrupt_pin(await cg.gpio_pin_expression(interrupt_pin)))
+    
 
