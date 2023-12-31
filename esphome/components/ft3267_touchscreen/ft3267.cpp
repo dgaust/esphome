@@ -7,8 +7,7 @@
 
 #include "ft3267.h"
 #include "esphome/core/log.h"
-#include "Wire.h"
-#include "esphome/core/helpers.h"
+
 // Registers
 // Reference: https://focuslcds.com/content/FT6236.pdf
 namespace esphome {
@@ -23,7 +22,6 @@ static const uint8_t FT3267_ADDR_TOUCH2_X = 0x09;
 static const uint8_t FT3267_ADDR_TOUCH2_Y = 0x0B;
 static const uint8_t FT3267_GESTUREID = 0x01;
 static const uint8_t FT3267_ADDR = 0x51;
-static const uint8_t FT5x06_TOUCH1_XH = 0x03;
 static const char *const TAG = "ft3267Touchscreen";
 
 #define FT5x06_ADDR                    (0x51)
@@ -33,7 +31,7 @@ static const char *const TAG = "ft3267Touchscreen";
 #define FT5x06_TOUCH_POINTS            (0x02)
 
 #define FT5x06_TOUCH1_EV_FLAG          (0x03)
-
+#define FT5x06_TOUCH1_XH               (0x03)
 #define FT5x06_TOUCH1_XL               (0x04)
 #define FT5x06_TOUCH1_YH               (0x05)
 #define FT5x06_TOUCH1_YL               (0x06)
@@ -83,12 +81,9 @@ static const char *const TAG = "ft3267Touchscreen";
 #define FT5x06_ID_G_FT5201ID           (0xA8)
 #define FT5x06_ID_G_ERR                (0xA9)
 
-TwoWire *_Wrie = NULL;
-
 void ft3267Touchscreen::setup() {
   ESP_LOGCONFIG(TAG, "Setting up FT3267Touchscreen Touchscreen...");
-  init_wire(*_Wrie);
-
+  
   if (this->interrupt_pin_ != nullptr) {
     this->interrupt_pin_->pin_mode(gpio::FLAG_INPUT | gpio::FLAG_PULLUP);
     this->interrupt_pin_->setup();
@@ -118,17 +113,9 @@ void ft3267Touchscreen::setup() {
 
 }
 
-void init_wire(TwoWire &Wrie)
-{
-  _Wrie = &Wrie;
-}
-
 void ft3267Touchscreen::update_touches() {
   
   int touch_count = this->read_touch_count_();
-  int ft3267_count = ft3267_get_touch_points_num(0);
-  ESP_LOGD("FT3267", "FT63X^ Example Touch Points: %d", touch_count);
-  ESP_LOGD("FT3267", "FT327 Example Touch Points: %d", ft3267_count);
   
   if (touch_count == 0) {
     return;
@@ -138,7 +125,7 @@ void ft3267Touchscreen::update_touches() {
   uint8_t gesture_id= this->read_touch_gesture_();
   uint8_t x = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_X);
   uint8_t y = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_Y);
-  
+ 
   ESP_LOGD("FT3267", "Gesture ID: %d", gesture_id);
   this->add_raw_touch_position_(touch_id, x, y);
   ESP_LOGD("FT3267", "Touches %d Touch %d detected at x: %d, y and gesture id %d: %d", touch_count, touch_id, x, y, gesture_id);
@@ -166,26 +153,15 @@ void ft3267Touchscreen::dump_config() {
   LOG_PIN("  Reset Pin: ", this->reset_pin_);
 }
 
-uint8_t ft3267Touchscreen::read_touch_count_() { 
-  // return this->read_byte_(FT3267_ADDR_TOUCH_COUNT); 
-  esphome::optional<uint8_t> optional_value = this->read_byte(FT3267_ADDR_TOUCH_COUNT);
-  if (optional_value)
-    return *optional_value;
-  else
-    return 0;
-}
+uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_ADDR_TOUCH_COUNT); }
 
 uint8_t ft3267Touchscreen::test_gesture_() { return this->read_byte_(FT3267_GESTUREID); }
 // Touch functions
 uint8_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
-  
-  //static uint8_t data[4];
-  //this->read_bytes(FT5x06_TOUCH1_XH, coordinate, data);
   uint8_t read_buf[2];
   read_buf[0] = this->read_byte_(coordinate);
   read_buf[1] = this->read_byte_(coordinate + 1);
   return ((read_buf[0] & 0x0f) << 8) | read_buf[1];
-  
 }
 
 uint8_t ft3267Touchscreen::read_touch_gesture_() {
@@ -196,6 +172,7 @@ uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->rea
 
 uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
   uint8_t byte = 0;
+  
   this->read_byte(addr, &byte);
   return byte;
 }
@@ -207,60 +184,6 @@ uint8_t ft3267Touchscreen::gesture_read_byte_(uint8_t reg_addr) {
   return byte;
 }
 
-// experiemental from driver
-static inline int32_t ft3267_read_byte(uint8_t reg_addr, uint8_t *data)
-{
-    // return i2c_bus_read_byte(ft3267_handle, reg_addr, data);
-    _Wrie->beginTransmission(FT5x06_ADDR);
-    _Wrie->write(reg_addr);
-    _Wrie->endTransmission();
-    uint8_t bytesReceived = _Wrie->requestFrom(FT5x06_ADDR, 1);
-    if (bytesReceived)
-        _Wrie->readBytes(data, bytesReceived);
-    return 0;
-}
-
-int32_t ft3267_read_pos(uint8_t *touch_points_num, uint16_t *x, uint16_t *y)
-{
-    int32_t ret_val = 'ESP_OK';
-    static uint8_t data[4];
-
-    ret_val |= ft3267_get_touch_points_num(touch_points_num);
-    *touch_points_num = (*touch_points_num) & 0x0f;
-    if (0 == *touch_points_num) {
-    } else {
-        ret_val |= ft3267_read_bytes(FT5x06_TOUCH1_XH, 4, data);
-
-        *x = ((data[0] & 0x0f) << 8) + data[1];
-        *y = ((data[2] & 0x0f) << 8) + data[3];
-    }
-
-    return ret_val;
-}
-
-static int32_t ft3267_get_touch_points_num(uint8_t *touch_points_num)
-{
-
-    return ft3267_read_byte(FT5x06_TOUCH_POINTS, touch_points_num);
-}
-
-static inline int32_t ft3267_read_bytes(uint8_t reg_addr, size_t data_len, uint8_t *data)
-{
-    // return i2c_bus_read_bytes(ft3267_handle, reg_addr, data_len, data);
-    _Wrie->beginTransmission(FT5x06_ADDR);
-    _Wrie->write(reg_addr);
-    _Wrie->endTransmission();
-    uint8_t bytesReceived = _Wrie->requestFrom(FT5x06_ADDR, data_len);
-    uint8_t index = 0;
-    while (_Wrie->available())
-        data[index++] = _Wrie->read();
-    return 0;
-}
-
-static int32_t ft3267_get_touch_points_num(uint8_t *touch_points_num)
-{
-    return ft3267_read_byte(FT5x06_TOUCH_POINTS, touch_points_num);
-}
 
 }  // namespace ft3267
 }  // namespace esphome
