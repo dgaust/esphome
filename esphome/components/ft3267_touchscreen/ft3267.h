@@ -8,8 +8,8 @@
 #pragma once
 
 #include "esphome/components/i2c/i2c.h"
-#include "touchscreen.h"
 #include "esphome/core/component.h"
+#include "esphome/components/touchscreen/touchscreen.h"
 
 namespace esphome {
 namespace ft3267 {
@@ -40,13 +40,15 @@ class ft3267Touchscreen : public Touchscreen, public i2c::I2CDevice {
   void update_touches() override;
   InternalGPIOPin *interrupt_pin_{nullptr};
   GPIOPin *reset_pin_{nullptr};
+
+
   uint8_t read_touch_count_();
   uint16_t read_touch_coordinate_(uint8_t coordinate);
   uint8_t read_touch_id_(uint8_t id_address);
-  uint8_t get_position_(uint8_t *touch_points_num, uint16_t *x, uint16_t *y);
+  uint8_t get_position_(uint8_t *touch_points_num, uint8_t *x, uint8_t *y);
   uint8_t read_gesture(ft3267_gesture *gesture); 
   uint8_t ft3267_get_touch_points_num(uint8_t *touch_points_num);
-  u_int8_t ft3267_read_pos(uint8_t *touch_points_num, uint16_t *x, uint16_t *y);
+  u_int8_t ft3267_read_pos(uint8_t *touch_points_num, uint8_t *x, uint8_t *y);
 };
 
 
