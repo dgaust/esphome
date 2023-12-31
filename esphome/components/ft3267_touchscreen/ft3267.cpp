@@ -137,7 +137,7 @@ uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
   return byte;
 }
 
-uint8_t ft3267Touchscreen::get_position_(uint8_t *touch_points_num, uint16_t *x, uint16_t *y) {
+/* uint8_t ft3267Touchscreen::get_position_(uint8_t *touch_points_num, uint16_t *x, uint16_t *y) {
   static uint8_t data[4];
   uint8_t ret_val = 0; // Declare ret_val variable
   *touch_points_num = (*touch_points_num) & 0x0f;
@@ -148,7 +148,7 @@ uint8_t ft3267Touchscreen::get_position_(uint8_t *touch_points_num, uint16_t *x,
         *y = ((data[2] & 0x0f) << 8) + data[3];
     }
   return ret_val;
-}
+} */
 
 
 void ft3267Touchscreen::hard_reset_() {
