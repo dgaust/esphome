@@ -25,6 +25,7 @@ static const uint8_t FT3267_TOUCH_POINTS = 0x02;
 static const uint8_t FT3267_TOUCH1_XH = 0x03;
 ft3267_gesture gestureData;
 
+// #define FT3267_TOUCH1_XH               (0x03)
 #define FT3267_TOUCH1_XL               (0x04)
 #define FT3267_TOUCH1_YH               (0x05)
 #define FT3267_TOUCH1_YL               (0x06)
@@ -122,6 +123,7 @@ void ft3267Touchscreen::update_touches() {
   uint8_t y;
   uint8_t gesture;
 
+  this->write_byte(FT3267_TOUCH1_XH, 1);
   this->read_register(FT3267_TOUCH1_XH, data, 4);
   x = ((data[0] & 0x0f) << 8) + data[1];
   y = ((data[2] & 0x0f) << 8) + data[3];
