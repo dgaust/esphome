@@ -17,6 +17,7 @@ namespace ft3267 {
 
 static const char *const TAG = "ft3267Touchscreen";
 static const uint8_t FT3267_GESTURE_ID = 0x01;
+static const ft3267_gesture gestureData;
 
 #define FT3267_ADDR                    (0x51)
 
@@ -75,6 +76,7 @@ static const uint8_t FT3267_GESTURE_ID = 0x01;
 #define FT3267_ID_G_FT5201ID           (0xA8)
 #define FT3267_ID_G_ERR                (0xA9)
 
+
 void ft3267Touchscreen::setup() {
   ESP_LOGCONFIG(TAG, "Setting up FT3267Touchscreen...");
   
@@ -109,12 +111,14 @@ void ft3267Touchscreen::setup() {
 }
 
 void ft3267Touchscreen::update_touches() {
-  ft3267_gesture gestureData;
+  
   int touch_count = this->read_touch_count_();
   if (touch_count == 0) {
     return;
   }
+
   uint8_t touch_id = this->read_touch_id_(FT3267_TOUCH1_EV_FLAG);
+
   ESP_LOGD("FT3267", "Touch Count: %d", touch_count);
   ESP_LOGD("FT3267", "Touch ID: %d", touch_id);
   uint16_t x = this->read_touch_coordinate_(FT3267_TOUCH1_XH);
