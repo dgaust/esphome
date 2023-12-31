@@ -120,7 +120,9 @@ void ft3267Touchscreen::update_touches() {
   if (touch_count == 0) {
     return;
   }
+  uint8_t touch_id = this->read_touch_id_(FT3267_TOUCH1_EV_FLAG);
   ESP_LOGD("FT3267", "Touch Count: %d", touch_count);
+  ESP_LOGD("FT3267", "Touch ID: %d", touch_id);
 }
 
 uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
