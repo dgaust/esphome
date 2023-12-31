@@ -135,7 +135,10 @@ void ft3267Touchscreen::update_touches() {
   ESP_LOGD("FT3267", "Gesture: %d", &gesture);
 }
 
-uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
+uint8_t ft3267Touchscreen::read_touch_count_() { 
+  uint8_t points;
+  return this->read_register(FT3267_TOUCH_POINTS, &points, 1); 
+}
 
 void ft3267Touchscreen::hard_reset_() {
   if (this->reset_pin_ != nullptr) {
