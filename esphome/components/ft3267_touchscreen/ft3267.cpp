@@ -114,8 +114,11 @@ void ft3267Touchscreen::setup() {
 }
 
 void ft3267Touchscreen::update_touches() {
-  
-  int touch_count = this->read_touch_count_();
+  uint16_t data_len;
+  uint16_t report = this->read((uint8_t *) &data_len, sizeof(data_len));
+  ESP_LOGD("FT3267", "Reported Stuff: %d", report);
+
+  /* int touch_count = this->read_touch_count_();
   
   if (touch_count == 0) {
     return;
@@ -135,7 +138,7 @@ void ft3267Touchscreen::update_touches() {
     y = this->read_touch_coordinate_(FT3267_ADDR_TOUCH2_Y);
     this->add_raw_touch_position_(touch_id, x, y);
     ESP_LOGD("FT3267", "Touch %d detected at x: %d, y: %d", touch_id, x, y);
-  }
+  } */
 }
 
 void ft3267Touchscreen::hard_reset_() {
@@ -184,6 +187,20 @@ uint8_t ft3267Touchscreen::gesture_read_byte_(uint8_t reg_addr) {
   return byte;
 }
 
+uint8_t ft3267_read_pos(uint8_t touch_points_num)
+{
+    static uint8_t data[4];
+    touch_points_num = (touch_points_num) & 0x0f;
+    if (0 == touch_points_num) {
+    } else {
+        ret_val |= ft3267_read_bytes(FT5x06_TOUCH1_XH, 4, data);
+
+        *x = ((data[0] & 0x0f) << 8) + data[1];
+        *y = ((data[2] & 0x0f) << 8) + data[3];
+    }
+
+    return ret_val;
+}
 
 }  // namespace ft3267
 }  // namespace esphome
