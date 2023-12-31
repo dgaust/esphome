@@ -17,7 +17,7 @@ namespace ft3267 {
 
 static const char *const TAG = "ft3267Touchscreen";
 static const uint8_t FT3267_GESTURE_ID = 0x01;
-static const ft3267_gesture gestureData;
+ft3267_gesture gestureData;
 
 #define FT3267_ADDR                    (0x51)
 
