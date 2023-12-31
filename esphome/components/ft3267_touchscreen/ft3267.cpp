@@ -137,6 +137,13 @@ uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
   return byte;
 }
 
+uint16_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
+  uint8_t read_buf[2];
+  read_buf[0] = this->read_byte_(coordinate);
+  read_buf[1] = this->read_byte_(coordinate + 1);
+  return ((read_buf[0] & 0x0f) << 8) | read_buf[1];
+}
+
 /* uint8_t ft3267Touchscreen::get_position_(uint8_t *touch_points_num, uint16_t *x, uint16_t *y) {
   static uint8_t data[4];
   uint8_t ret_val = 0; // Declare ret_val variable
