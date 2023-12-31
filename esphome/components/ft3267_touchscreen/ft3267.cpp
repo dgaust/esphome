@@ -108,8 +108,8 @@ void ft3267Touchscreen::setup() {
   this->write_byte(FT5x06_ID_G_MODE, 0);
 
   // Get touch resolution
-  this->x_raw_max_ = 240;
-  this->y_raw_max_ = 240;
+  this->x_raw_max_ = this->get_width_();
+  this->y_raw_max_ = this->get_height_();
 
 }
 
@@ -153,7 +153,7 @@ void ft3267Touchscreen::dump_config() {
   LOG_PIN("  Reset Pin: ", this->reset_pin_);
 }
 
-uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_ADDR_TOUCH_COUNT); }
+uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT5x06_TOUCH_POINTS); }
 
 uint8_t ft3267Touchscreen::test_gesture_() { return this->read_byte_(FT3267_GESTUREID); }
 // Touch functions
