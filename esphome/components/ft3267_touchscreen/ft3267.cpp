@@ -17,16 +17,14 @@ namespace ft3267 {
 
 static const char *const TAG = "ft3267Touchscreen";
 
+static const uint8_t FT3267_ADDR = 0x51;
+
+static const uint8_t FT3267_DEVICE_MODE = 0x00;
+static const uint8_t FT3267_GESTURE_ID = 0x01;
+static const uint8_t FT3267_TOUCH_POINTS = 0x02;
+static const uint8_t FT3267_TOUCH1_XH = 0x03;
 ft3267_gesture gestureData;
 
-#define FT3267_ADDR                    (0x51)
-
-#define FT3267_DEVICE_MODE             (0x00)
-#define FT3267_GESTURE_ID              (0x01)
-#define FT3267_TOUCH_POINTS            (0x02)
-
-#define FT3267_TOUCH1_EV_FLAG          (0x03)
-#define FT3267_TOUCH1_XH               (0x03)
 #define FT3267_TOUCH1_XL               (0x04)
 #define FT3267_TOUCH1_YH               (0x05)
 #define FT3267_TOUCH1_YL               (0x06)
@@ -138,7 +136,7 @@ void ft3267Touchscreen::update_touches() {
   ESP_LOGD("FT3267", "Device Mode: %d", &devicemode); 
   ESP_LOGD("FT3267", "X: %d", &x);
   ESP_LOGD("FT3267", "Y: %d", &y);
-  ESP_LOGD("FT3267", "Gesture: %d", ft3267_gesture(gesture));
+  ESP_LOGD("FT3267", "Gesture: %d", &gesture);
 }
 
 uint8_t getpositon(uint8_t *data){
