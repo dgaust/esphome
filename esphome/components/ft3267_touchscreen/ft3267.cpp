@@ -13,22 +13,15 @@
 namespace esphome {
 namespace ft3267 {
 
-enum ft3267_gesture {
-  ft3267_gesture_none = 0x00,
-  ft3267_gesture_move_up = 0x10,
-  ft3267_gesture_move_left = 0x14,
-  ft3267_gesture_move_down = 0x18,
-  ft3267_gesture_move_right = 0x1c,
-  ft3267_gesture_zoom_in = 0x48,
-  ft3267_gesture_zoom_out = 0x49,
-};
+
 
 static const char *const TAG = "ft3267Touchscreen";
+static const uint8_t FT3267_GESTURE_ID = 0x01;
 
 #define FT3267_ADDR                    (0x51)
 
 #define FT3267_DEVICE_MODE             (0x00)
-#define FT3267_GESTURE_ID              (0x01)
+// #define FT3267_GESTURE_ID              (0x01)
 #define FT3267_TOUCH_POINTS            (0x02)
 
 #define FT3267_TOUCH1_EV_FLAG          (0x03)
@@ -116,6 +109,7 @@ void ft3267Touchscreen::setup() {
 }
 
 void ft3267Touchscreen::update_touches() {
+  ft3267_gesture gestureData;
   int touch_count = this->read_touch_count_();
   if (touch_count == 0) {
     return;
@@ -129,6 +123,8 @@ void ft3267Touchscreen::update_touches() {
   // ESP_LOGD("FT3267", "Touch Y: %d", y);
   uint8_t pos = this->get_position_(&touch_id, &x, &y);
   ESP_LOGD("FT3267", "Touch Pos: %d", pos);
+  uint8_t gesture = this->read_gesture(&gestureData);
+  ESP_LOGD("FT3267", "Gesture: %d", gesture);
 }
 
 uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
@@ -162,6 +158,9 @@ uint8_t ft3267Touchscreen::get_position_(uint8_t *touch_points_num, uint16_t *x,
   return ret_val;
 }
 
+uint8_t ft3267Touchscreen::read_gesture(ft3267_gesture *gesture) {
+    return this->read_byte(FT3267_GESTURE_ID, (uint8_t *)gesture);
+}
 
 void ft3267Touchscreen::hard_reset_() {
   if (this->reset_pin_ != nullptr) {

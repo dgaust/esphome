@@ -16,6 +16,16 @@ namespace ft3267 {
 
 using namespace touchscreen;
 
+enum ft3267_gesture {
+  ft3267_gesture_none = 0x00,
+  ft3267_gesture_move_up = 0x10,
+  ft3267_gesture_move_left = 0x14,
+  ft3267_gesture_move_down = 0x18,
+  ft3267_gesture_move_right = 0x1c,
+  ft3267_gesture_zoom_in = 0x48,
+  ft3267_gesture_zoom_out = 0x49,
+};
+
 class ft3267Touchscreen : public Touchscreen, public i2c::I2CDevice {
  public:
   void setup() override;
@@ -34,6 +44,7 @@ class ft3267Touchscreen : public Touchscreen, public i2c::I2CDevice {
   uint16_t read_touch_coordinate_(uint8_t coordinate);
   uint8_t read_touch_id_(uint8_t id_address);
   uint8_t get_position_(uint8_t *touch_points_num, uint16_t *x, uint16_t *y);
+  uint8_t read_gesture(ft3267_gesture *gesture); 
 };
 
 
