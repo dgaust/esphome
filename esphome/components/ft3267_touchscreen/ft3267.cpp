@@ -117,7 +117,7 @@ void ft3267Touchscreen::update_touches() {
     return;
   }
 
-  uint8_t touch_id = this->read_touch_id_(FT3267_TOUCH1_EV_FLAG);
+  uint8_t touch_id = this->read_touch_id_(FT3267_TOUCH_POINTS);
 
   ESP_LOGD("FT3267", "Touch Count: %d", touch_count);
   ESP_LOGD("FT3267", "Touch ID: %d", touch_id);
@@ -164,6 +164,11 @@ uint8_t ft3267Touchscreen::get_position_(uint8_t *touch_points_num, uint16_t *x,
 
 uint8_t ft3267Touchscreen::read_gesture(ft3267_gesture *gesture) {
     return this->read_byte(FT3267_GESTURE_ID, (uint8_t *)gesture);
+}
+
+uint8_t ft3267Touchscreen::ft3267_get_touch_points_num(uint8_t *touch_points_num)
+{
+    return this->read_byte(FT3267_TOUCH_POINTS, touch_points_num);
 }
 
 void ft3267Touchscreen::hard_reset_() {
