@@ -7,82 +7,86 @@
 
 #include "ft3267.h"
 #include "esphome/core/log.h"
+#include "Wire.h"
 
 // Registers
 // Reference: https://focuslcds.com/content/FT6236.pdf
 namespace esphome {
 namespace ft3267 {
 
-static const uint8_t FT3267_ADDR_TOUCH_COUNT = 0x02;
-static const uint8_t FT3267_ADDR_TOUCH1_ID = 0x05;
-static const uint8_t FT3267_ADDR_TOUCH1_X = 0x03;
-static const uint8_t FT3267_ADDR_TOUCH1_Y = 0x05;
-static const uint8_t FT3267_ADDR_TOUCH2_ID = 0x09;
-static const uint8_t FT3267_ADDR_TOUCH2_X = 0x09;
-static const uint8_t FT3267_ADDR_TOUCH2_Y = 0x0B;
-static const uint8_t FT3267_GESTUREID = 0x01;
-static const uint8_t FT3267_ADDR = 0x51;
+enum ft3267_gesture {
+  ft3267_gesture_none = 0x00,
+  ft3267_gesture_move_up = 0x10,
+  ft3267_gesture_move_left = 0x14,
+  ft3267_gesture_move_down = 0x18,
+  ft3267_gesture_move_right = 0x1c,
+  ft3267_gesture_zoom_in = 0x48,
+  ft3267_gesture_zoom_out = 0x49,
+};
+
 static const char *const TAG = "ft3267Touchscreen";
 
-#define FT5x06_ADDR                    (0x51)
+#define FT3267_ADDR                    (0x51)
 
-#define FT5x06_DEVICE_MODE             (0x00)
-#define FT5x06_GESTURE_ID              (0x01)
-#define FT5x06_TOUCH_POINTS            (0x02)
+#define FT3267_DEVICE_MODE             (0x00)
+#define FT3267_GESTURE_ID              (0x01)
+#define FT3267_TOUCH_POINTS            (0x02)
 
-#define FT5x06_TOUCH1_EV_FLAG          (0x03)
-#define FT5x06_TOUCH1_XH               (0x03)
-#define FT5x06_TOUCH1_XL               (0x04)
-#define FT5x06_TOUCH1_YH               (0x05)
-#define FT5x06_TOUCH1_YL               (0x06)
+#define FT3267_TOUCH1_EV_FLAG          (0x03)
+#define FT3267_TOUCH1_XH               (0x03)
+#define FT3267_TOUCH1_XL               (0x04)
+#define FT3267_TOUCH1_YH               (0x05)
+#define FT3267_TOUCH1_YL               (0x06)
 
-#define FT5x06_TOUCH2_EV_FLAG          (0x09)
-#define FT5x06_TOUCH2_XH               (0x09)
-#define FT5x06_TOUCH2_XL               (0x0A)
-#define FT5x06_TOUCH2_YH               (0x0B)
-#define FT5x06_TOUCH2_YL               (0x0C)
+#define FT3267_TOUCH2_EV_FLAG          (0x09)
+#define FT3267_TOUCH2_XH               (0x09)
+#define FT3267_TOUCH2_XL               (0x0A)
+#define FT3267_TOUCH2_YH               (0x0B)
+#define FT3267_TOUCH2_YL               (0x0C)
 
-#define FT5x06_TOUCH3_EV_FLAG          (0x0F)
-#define FT5x06_TOUCH3_XH               (0x0F)
-#define FT5x06_TOUCH3_XL               (0x10)
-#define FT5x06_TOUCH3_YH               (0x11)
-#define FT5x06_TOUCH3_YL               (0x12)
+#define FT3267_TOUCH3_EV_FLAG          (0x0F)
+#define FT3267_TOUCH3_XH               (0x0F)
+#define FT3267_TOUCH3_XL               (0x10)
+#define FT3267_TOUCH3_YH               (0x11)
+#define FT3267_TOUCH3_YL               (0x12)
 
-#define FT5x06_TOUCH4_EV_FLAG          (0x15)
-#define FT5x06_TOUCH4_XH               (0x15)
-#define FT5x06_TOUCH4_XL               (0x16)
-#define FT5x06_TOUCH4_YH               (0x17)
-#define FT5x06_TOUCH4_YL               (0x18)
+#define FT3267_TOUCH4_EV_FLAG          (0x15)
+#define FT3267_TOUCH4_XH               (0x15)
+#define FT3267_TOUCH4_XL               (0x16)
+#define FT3267_TOUCH4_YH               (0x17)
+#define FT3267_TOUCH4_YL               (0x18)
 
-#define FT5x06_TOUCH5_EV_FLAG          (0x1B)
-#define FT5x06_TOUCH5_XH               (0x1B)
-#define FT5x06_TOUCH5_XL               (0x1C)
-#define FT5x06_TOUCH5_YH               (0x1D)
-#define FT5x06_TOUCH5_YL               (0x1E)
+#define FT3267_TOUCH5_EV_FLAG          (0x1B)
+#define FT3267_TOUCH5_XH               (0x1B)
+#define FT3267_TOUCH5_XL               (0x1C)
+#define FT3267_TOUCH5_YH               (0x1D)
+#define FT3267_TOUCH5_YL               (0x1E)
 
-#define FT5x06_ID_G_THGROUP            (0x80)
-#define FT5x06_ID_G_THPEAK             (0x81)
-#define FT5x06_ID_G_THCAL              (0x82)
-#define FT5x06_ID_G_THWATER            (0x83)
-#define FT5x06_ID_G_THTEMP             (0x84)
-#define FT5x06_ID_G_THDIFF             (0x85)
-#define FT5x06_ID_G_CTRL               (0x86)
-#define FT5x06_ID_G_TIME_ENTER_MONITOR (0x87)
-#define FT5x06_ID_G_PERIODACTIVE       (0x88)
-#define FT5x06_ID_G_PERIODMONITOR      (0x89)
-#define FT5x06_ID_G_AUTO_CLB_MODE      (0xA0)
-#define FT5x06_ID_G_LIB_VERSION_H      (0xA1)
-#define FT5x06_ID_G_LIB_VERSION_L      (0xA2)
-#define FT5x06_ID_G_CIPHER             (0xA3)
-#define FT5x06_ID_G_MODE               (0xA4)
-#define FT5x06_ID_G_PMODE              (0xA5)
-#define FT5x06_ID_G_FIRMID             (0xA6)
-#define FT5x06_ID_G_STATE              (0xA7)
-#define FT5x06_ID_G_FT5201ID           (0xA8)
-#define FT5x06_ID_G_ERR                (0xA9)
+#define FT3267_ID_G_THGROUP            (0x80)
+#define FT3267_ID_G_THPEAK             (0x81)
+#define FT3267_ID_G_THCAL              (0x82)
+#define FT3267_ID_G_THWATER            (0x83)
+#define FT3267_ID_G_THTEMP             (0x84)
+#define FT3267_ID_G_THDIFF             (0x85)
+#define FT3267_ID_G_CTRL               (0x86)
+#define FT3267_ID_G_TIME_ENTER_MONITOR (0x87)
+#define FT3267_ID_G_PERIODACTIVE       (0x88)
+#define FT3267_ID_G_PERIODMONITOR      (0x89)
+#define FT3267_ID_G_AUTO_CLB_MODE      (0xA0)
+#define FT3267_ID_G_LIB_VERSION_H      (0xA1)
+#define FT3267_ID_G_LIB_VERSION_L      (0xA2)
+#define FT3267_ID_G_CIPHER             (0xA3)
+#define FT3267_ID_G_MODE               (0xA4)
+#define FT3267_ID_G_PMODE              (0xA5)
+#define FT3267_ID_G_FIRMID             (0xA6)
+#define FT3267_ID_G_STATE              (0xA7)
+#define FT3267_ID_G_FT5201ID           (0xA8)
+#define FT3267_ID_G_ERR                (0xA9)
+
+TwoWire *_Wrie = NULL;
 
 void ft3267Touchscreen::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up FT3267Touchscreen Touchscreen...");
+  ESP_LOGCONFIG(TAG, "Setting up FT3267Touchscreen...");
   
   if (this->interrupt_pin_ != nullptr) {
     this->interrupt_pin_->pin_mode(gpio::FLAG_INPUT | gpio::FLAG_PULLUP);
@@ -96,49 +100,81 @@ void ft3267Touchscreen::setup() {
 
   this->hard_reset_();
 
-  this->write_byte(FT5x06_ID_G_THGROUP, 70);
-  this->write_byte(FT5x06_ID_G_THPEAK, 60);
-  this->write_byte(FT5x06_ID_G_THCAL, 16);
-  this->write_byte(FT5x06_ID_G_THWATER, 60);
-  this->write_byte(FT5x06_ID_G_THTEMP, 10);
-  this->write_byte(FT5x06_ID_G_THDIFF, 20);
-  this->write_byte(FT5x06_ID_G_TIME_ENTER_MONITOR, 2);
-  this->write_byte(FT5x06_ID_G_PERIODACTIVE, 12);
-  this->write_byte(FT5x06_ID_G_PERIODMONITOR, 40);
-  this->write_byte(FT5x06_ID_G_MODE, 0);
+  // Setup device based on ft3267 driver
+  this->write_byte(FT3267_ID_G_THGROUP, 70);
+  this->write_byte(FT3267_ID_G_THPEAK, 60);
+  this->write_byte(FT3267_ID_G_THCAL, 16);
+  this->write_byte(FT3267_ID_G_THWATER, 60);
+  this->write_byte(FT3267_ID_G_THTEMP, 10);
+  this->write_byte(FT3267_ID_G_THDIFF, 20);
+  this->write_byte(FT3267_ID_G_TIME_ENTER_MONITOR, 2);
+  this->write_byte(FT3267_ID_G_PERIODACTIVE, 12);
+  this->write_byte(FT3267_ID_G_PERIODMONITOR, 40);
+  this->write_byte(FT3267_ID_G_MODE, 0);
 
-  // Get touch resolution
+  // Set the touch resolution
   this->x_raw_max_ = this->get_width_();
   this->y_raw_max_ = this->get_height_();
-  this->store_.touched = true;
+  intiatewire(*_Wrie);
+}
+
+void intiatewire(TwoWire &Wrie) {
+  _Wrie = &Wrie;
 }
 
 void ft3267Touchscreen::update_touches() {
-  uint16_t data_len;
-  uint16_t report = this->read((uint8_t *) &data_len, sizeof(data_len));
-  ESP_LOGD("FT3267", "Reported Stuff: %d", report);
+  uint8_t touch_id = this->read_touch_id_(FT3267_TOUCH1_EV_FLAG);  // id1 = 0 or 1
+  int touch_count = ft3267_get_touch_points_num(&touch_id);
+  ESP_LOGD("FT3267", "Touch ID: %d", touch_id);
+  ESP_LOGD("FT3267", "Touch Count: %d", touch_count);
+}
 
-  /* int touch_count = this->read_touch_count_();
-  
-  if (touch_count == 0) {
-    return;
-  }
+static uint8_t ft3267_get_touch_points_num(uint8_t *touch_points_num)
+{
+    return ft3267_read_byte(FT3267_TOUCH_POINTS, touch_points_num);
+}
 
-  uint8_t touch_id = this->read_touch_id_(FT3267_ADDR_TOUCH1_ID);  // id1 = 0 or 1
-  uint8_t gesture_id= this->read_touch_gesture_();
-  uint8_t x = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_X);
-  uint8_t y = this->read_touch_coordinate_(FT3267_ADDR_TOUCH1_Y);
- 
-  ESP_LOGD("FT3267", "Gesture ID: %d", gesture_id);
-  this->add_raw_touch_position_(touch_id, x, y);
-  ESP_LOGD("FT3267", "Touches %d Touch %d detected at x: %d, y and gesture id %d: %d", touch_count, touch_id, x, y, gesture_id);
-  if (touch_count >= 2) {
-    touch_id = this->read_touch_id_(FT3267_ADDR_TOUCH2_ID);  // id2 = 0 or 1(~id1 & 0x01)
-    x = this->read_touch_coordinate_(FT3267_ADDR_TOUCH2_X);
-    y = this->read_touch_coordinate_(FT3267_ADDR_TOUCH2_Y);
-    this->add_raw_touch_position_(touch_id, x, y);
-    ESP_LOGD("FT3267", "Touch %d detected at x: %d, y: %d", touch_id, x, y);
-  } */
+static inline uint8_t ft3267_read_byte(uint8_t reg_addr, uint8_t *data)
+{
+    // return i2c_bus_read_byte(ft3267_handle, reg_addr, data);
+    _Wrie->beginTransmission(FT3267_ADDR);
+    _Wrie->write(reg_addr);
+    _Wrie->endTransmission();
+    uint8_t bytesReceived = _Wrie->requestFrom(FT3267_ADDR, 1);
+    if (bytesReceived)
+        _Wrie->readBytes(data, bytesReceived);
+    return 0;
+}
+
+static inline uint8_t ft3267_read_bytes(uint8_t reg_addr, size_t data_len, uint8_t *data)
+{
+    // return i2c_bus_read_bytes(ft3267_handle, reg_addr, data_len, data);
+    _Wrie->beginTransmission(FT3267_ADDR);
+    _Wrie->write(reg_addr);
+    _Wrie->endTransmission();
+    uint8_t bytesReceived = _Wrie->requestFrom(FT3267_ADDR, data_len);
+    uint8_t index = 0;
+    while (_Wrie->available())
+        data[index++] = _Wrie->read();
+    return 0;
+}
+
+uint8_t ft3267_read_pos(uint8_t *touch_points_num, uint16_t *x, uint16_t *y)
+{
+    uint8_t ret_val = 0;
+    static uint8_t data[4];
+
+    ret_val |= ft3267_get_touch_points_num(touch_points_num);
+    *touch_points_num = (*touch_points_num) & 0x0f;
+    if (0 == *touch_points_num) {
+    } else {
+        ret_val |= ft3267_read_bytes(FT3267_TOUCH1_XH, 4, data);
+
+        *x = ((data[0] & 0x0f) << 8) + data[1];
+        *y = ((data[2] & 0x0f) << 8) + data[3];
+    }
+
+    return ret_val;
 }
 
 void ft3267Touchscreen::hard_reset_() {
@@ -155,52 +191,6 @@ void ft3267Touchscreen::dump_config() {
   LOG_PIN("  Interrupt Pin: ", this->interrupt_pin_);
   LOG_PIN("  Reset Pin: ", this->reset_pin_);
 }
-
-uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT5x06_TOUCH_POINTS); }
-
-uint8_t ft3267Touchscreen::test_gesture_() { return this->read_byte_(FT3267_GESTUREID); }
-// Touch functions
-uint8_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
-  uint8_t read_buf[2];
-  read_buf[0] = this->read_byte_(coordinate);
-  read_buf[1] = this->read_byte_(coordinate + 1);
-  return ((read_buf[0] & 0x0f) << 8) | read_buf[1];
-}
-
-uint8_t ft3267Touchscreen::read_touch_gesture_() {
-  return gesture_read_byte_(FT5x06_GESTURE_ID);
-}
-
-uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->read_byte_(id_address) >> 4; }
-
-uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
-  uint8_t byte = 0;
-  
-  this->read_byte(addr, &byte);
-  return byte;
-}
-
-uint8_t ft3267Touchscreen::gesture_read_byte_(uint8_t reg_addr) {
-  uint8_t byte = 0;
-  this->write_register(FT3267_ADDR, &reg_addr, 1, false);
-  this->read_byte(reg_addr, &byte);
-  return byte;
-}
-
-/* uint8_t ft3267_read_pos(uint8_t touch_points_num)
-{
-    static uint8_t data[4];
-    touch_points_num = (touch_points_num) & 0x0f;
-    if (0 == touch_points_num) {
-    } else {
-        ret_val |= ft3267_read_bytes(FT5x06_TOUCH1_XH, 4, data);
-
-        *x = ((data[0] & 0x0f) << 8) + data[1];
-        *y = ((data[2] & 0x0f) << 8) + data[3];
-    }
-
-    return ret_val; 
-} */
 
 }  // namespace ft3267
 }  // namespace esphome
