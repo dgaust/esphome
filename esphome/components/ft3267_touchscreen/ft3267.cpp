@@ -125,8 +125,8 @@ void ft3267Touchscreen::update_touches() {
   ESP_LOGD("FT3267", "Touch ID: %d", touch_id);
   uint16_t x = this->read_touch_coordinate_(FT3267_TOUCH1_XH);
   uint16_t y = this->read_touch_coordinate_(FT3267_TOUCH1_YH);
-  ESP_LOGD("FT3267", "Touch X: %d", x);
-  ESP_LOGD("FT3267", "Touch Y: %d", y);
+  // ESP_LOGD("FT3267", "Touch X: %d", x);
+  // ESP_LOGD("FT3267", "Touch Y: %d", y);
   uint8_t pos = this->get_position_(&touch_id, &x, &y);
   ESP_LOGD("FT3267", "Touch Pos: %d", pos);
 }
@@ -156,6 +156,8 @@ uint8_t ft3267Touchscreen::get_position_(uint8_t *touch_points_num, uint16_t *x,
         ret_val |= this->read_bytes(FT3267_TOUCH1_XH, data, 4);
         *x = ((data[0] & 0x0f) << 8) + data[1];
         *y = ((data[2] & 0x0f) << 8) + data[3];
+        ESP_LOGD("FT3267", "Touch X: %d", x);
+        ESP_LOGD("FT3267", "Touch Y: %d", y);
     }
   return ret_val;
 }
