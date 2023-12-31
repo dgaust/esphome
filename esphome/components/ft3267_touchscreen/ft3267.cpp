@@ -93,16 +93,17 @@ void ft3267Touchscreen::setup() {
   this->hard_reset_();
 
   // Setup device based on ft3267 driver
-  this->write_byte(FT3267_ID_G_THGROUP, 70);
-  this->write_byte(FT3267_ID_G_THPEAK, 60);
-  this->write_byte(FT3267_ID_G_THCAL, 16);
-  this->write_byte(FT3267_ID_G_THWATER, 60);
-  this->write_byte(FT3267_ID_G_THTEMP, 10);
-  this->write_byte(FT3267_ID_G_THDIFF, 20);
-  this->write_byte(FT3267_ID_G_TIME_ENTER_MONITOR, 2);
-  this->write_byte(FT3267_ID_G_PERIODACTIVE, 12);
-  this->write_byte(FT3267_ID_G_PERIODMONITOR, 40);
-  this->write_byte(FT3267_ID_G_MODE, 0);
+
+  this->write_register(FT3267_ID_G_THGROUP, reinterpret_cast<const uint8_t*>(70), 1);
+  this->write_register(FT3267_ID_G_THPEAK, reinterpret_cast<const uint8_t*>(60), 1);
+  this->write_register(FT3267_ID_G_THCAL, reinterpret_cast<const uint8_t*>(16), 1);
+  this->write_register(FT3267_ID_G_THWATER, reinterpret_cast<const uint8_t*>(60), 1);
+  this->write_register(FT3267_ID_G_THTEMP, reinterpret_cast<const uint8_t*>(10), 1); 
+  this->write_register(FT3267_ID_G_THDIFF, reinterpret_cast<const uint8_t*>(20), 1);
+  this->write_register(FT3267_ID_G_TIME_ENTER_MONITOR, reinterpret_cast<const uint8_t*>(2), 1);
+  this->write_register(FT3267_ID_G_PERIODACTIVE, reinterpret_cast<const uint8_t*>(12), 1);  
+  this->write_register(FT3267_ID_G_PERIODMONITOR, reinterpret_cast<const uint8_t*>(40), 1);
+  this->write_register(FT3267_ID_G_MODE, reinterpret_cast<const uint8_t*>(0), 1);
 
   // Set the touch resolution
   this->x_raw_max_ = this->get_width_();
@@ -111,7 +112,6 @@ void ft3267Touchscreen::setup() {
 }
 
 void ft3267Touchscreen::update_touches() {
-  
   
   uint8_t touch_count = this->read_touch_count_();
   if (touch_count == 0) {
