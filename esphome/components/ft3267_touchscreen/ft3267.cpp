@@ -120,71 +120,19 @@ void ft3267Touchscreen::update_touches() {
   
   uint8_t touchregister;
   uint8_t devicemode;
-
   this->read_register(FT3267_TOUCH_POINTS, &touchregister, 1);
   this->read_register(FT3267_DEVICE_MODE, &devicemode, 1);
-  ESP_LOGD("FT3267", "Test Register: %d", touchregister);
-
+  ESP_LOGD("FT3267", "Test Register: %d", &touchregister);
+  ESP_LOGD("FT3267", "Device Mode: %d", &devicemode);
   uint8_t x;
   this->read_register(FT3267_TOUCH1_XH, &x, 1); 
   uint8_t y;
   this->read_register(FT3267_TOUCH1_YH, &y, 1); 
-
   uint8_t gesture;
   this->read_register(FT3267_GESTURE_ID, &gesture, 1);
   ESP_LOGD("FT3267", "X: %d", &x);
   ESP_LOGD("FT3267", "Y: %d", &y);
   ESP_LOGD("FT3267", "Gesture: %d", &gesture);
-}
-
-uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
-uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->read_byte_(id_address) >> 4; }
-
-u_int8_t ft3267Touchscreen::ft3267_read_pos(uint8_t *touch_points_num, uint16_t *x, uint16_t *y)
-{
-    
-    uint8_t ret_val = 0;
-    uint8_t touch_id = this->read_touch_id_(FT3267_TOUCH_POINTS);
-    static uint8_t data[4];
-    ret_val |= this->ft3267_get_touch_points_num(touch_points_num);
-    *touch_points_num = (*touch_points_num) & 0x0f;
-    if (0 == *touch_points_num) {
-    } else {
-        ret_val |= this->read_bytes(FT3267_TOUCH1_XH, data, 4);
-        ESP_LOGD("FT3267", "Ret val: %d", ret_val);
-        *x = ((data[0] & 0x0f) << 8) + data[1];
-        ESP_LOGD("FT3267", "Touch position x: %d", *x);
-        *y = ((data[2] & 0x0f) << 8) + data[3];
-        ESP_LOGD("FT3267", "Touch position y: %d", *y);
-    }
-    this->add_raw_touch_position_(touch_id, *x, *y);
-    return ret_val;
-}
-
-uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
-  // uint8_t byte = 0;
-  // this->read_byte(addr, &byte);
-  // return byte;
-  uint8_t data;
-    if (!this->read_byte(addr, &data))
-      return {};
-    return data;
-}
-
-uint16_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
-  uint8_t read_buf[2];
-  read_buf[0] = this->read_byte_(coordinate);
-  read_buf[1] = this->read_byte_(coordinate + 1);
-  return ((read_buf[0] & 0x0f) << 8) | read_buf[1];
-}
-
-uint8_t ft3267Touchscreen::read_gesture(ft3267_gesture *gesture) {
-    return this->read_byte(FT3267_GESTURE_ID, (uint8_t *)gesture);
-}
-
-uint8_t ft3267Touchscreen::ft3267_get_touch_points_num(uint8_t *touch_points_num)
-{
-    return this->read_byte(FT3267_TOUCH_POINTS, touch_points_num);
 }
 
 void ft3267Touchscreen::hard_reset_() {
