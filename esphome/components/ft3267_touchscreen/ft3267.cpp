@@ -187,9 +187,9 @@ uint8_t ft3267Touchscreen::gesture_read_byte_(uint8_t reg_addr) {
   return byte;
 }
 
-uint8_t ft3267_read_pos(uint8_t touch_points_num)
+/* uint8_t ft3267_read_pos(uint8_t touch_points_num)
 {
-   /* static uint8_t data[4];
+    static uint8_t data[4];
     touch_points_num = (touch_points_num) & 0x0f;
     if (0 == touch_points_num) {
     } else {
@@ -199,8 +199,8 @@ uint8_t ft3267_read_pos(uint8_t touch_points_num)
         *y = ((data[2] & 0x0f) << 8) + data[3];
     }
 
-    return ret_val; */
-}
+    return ret_val; 
+} */
 
 }  // namespace ft3267
 }  // namespace esphome
