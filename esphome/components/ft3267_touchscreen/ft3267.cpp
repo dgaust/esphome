@@ -127,7 +127,9 @@ void ft3267Touchscreen::update_touches() {
   y = ((data[2] & 0x0f) << 8) + data[3];
 
   this->read_register(FT3267_TOUCH_POINTS, &touchregister, 1);
-  this->read_register(FT3267_DEVICE_MODE, &devicemode, 1);
+  this->read_byte(FT3267_TOUCH_POINTS, &touch_count);
+  this->read_byte(FT3267_DEVICE_MODE, &devicemode);
+  // this->read_register(FT3267_DEVICE_MODE, &devicemode, 1);
   this->read_register(FT3267_GESTURE_ID, &gesture, 1);
   
   ESP_LOGD("FT3267", "Touch: %d", &data);
