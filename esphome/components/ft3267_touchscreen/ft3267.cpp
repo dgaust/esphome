@@ -118,25 +118,21 @@ void ft3267Touchscreen::update_touches() {
     return;
   }
   
-  uint8_t testregister;
-  this->read_register(FT3267_TOUCH_POINTS, &testregister, 1);
-  ESP_LOGD("FT3267", "Test Register: %d", testregister);
+  uint8_t touchregister;
 
-  uint8_t touch_id = this->read_touch_id_(FT3267_TOUCH_POINTS);
-  uint8_t touch = this->read_byte_(FT3267_TOUCH_POINTS);
-  ESP_LOGD("FT3267", "Touch Count: %d", touch_count);
-  ESP_LOGD("FT3267", "Touch ID: %d", touch_id);
-  ESP_LOGD("FT3267", "Touch Byte: %d", touch);
-  uint16_t x = this->read_byte_(FT3267_TOUCH1_XH);
-  uint16_t y = this->read_byte_(FT3267_TOUCH1_YH);
-  // uint16_t y = this->read_touch_coordinate_(FT3267_TOUCH3_YL);
-  
-  uint8_t touchtest = this->ft3267_read_pos(&touch_count, &x, &y);
-  this->add_raw_touch_position_(touch_id, x, y);
-  ESP_LOGD("FT3267", "Touch position: %d", touch);
-  ESP_LOGD("FT3267", "Touch Test: %d", touchtest);
-  uint8_t gesture = this->read_gesture(&gestureData);
-  ESP_LOGD("FT3267", "Gesture: %d", gesture);
+  this->read_register(FT3267_TOUCH_POINTS, &touchregister, 1);
+  ESP_LOGD("FT3267", "Test Register: %d", touchregister);
+
+  uint8_t x;
+  this->read_register(FT3267_TOUCH1_XH, &x, 1); 
+  uint8_t y;
+  this->read_register(FT3267_TOUCH1_YH, &y, 1); 
+
+  uint8_t gesture;
+  this->read_register(FT3267_GESTURE_ID, &gesture, 1);
+  ESP_LOGD("FT3267", "X: %d", &x);
+  ESP_LOGD("FT3267", "Y: %d", &y);
+  ESP_LOGD("FT3267", "Gesture: %d", &gesture);
 }
 
 uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
