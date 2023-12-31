@@ -139,6 +139,13 @@ void ft3267Touchscreen::update_touches() {
 uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
 uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->read_byte_(id_address) >> 4; }
 
+optional<uint8_t> read_byte(uint8_t a_register) {
+    uint8_t data;
+    if (!this->read_byte(a_register, &data))
+      return {};
+    return data;
+  }
+
 u_int8_t ft3267Touchscreen::ft3267_read_pos(uint8_t *touch_points_num, uint16_t *x, uint16_t *y)
 {
     uint8_t ret_val = 0;
@@ -160,9 +167,13 @@ u_int8_t ft3267Touchscreen::ft3267_read_pos(uint8_t *touch_points_num, uint16_t 
 }
 
 uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
-  uint8_t byte = 0;
-  this->read_byte(addr, &byte);
-  return byte;
+  // uint8_t byte = 0;
+  // this->read_byte(addr, &byte);
+  // return byte;
+  uint8_t data;
+    if (!this->read_byte(addr, &data))
+      return {};
+    return data;
 }
 
 uint16_t ft3267Touchscreen::read_touch_coordinate_(uint8_t coordinate) {
