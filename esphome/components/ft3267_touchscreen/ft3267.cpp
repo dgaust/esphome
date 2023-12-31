@@ -138,7 +138,8 @@ void ft3267Touchscreen::update_touches() {
 
 uint8_t ft3267Touchscreen::read_touch_count_() { 
   uint8_t points;
-  return this->read_register(FT3267_TOUCH_POINTS, &points, 1); 
+  this->read_register(FT3267_TOUCH_POINTS, &points, 1); 
+  return points;
 }
 
 void ft3267Touchscreen::hard_reset_() {
