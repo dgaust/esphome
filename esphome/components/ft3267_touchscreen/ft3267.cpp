@@ -7,7 +7,6 @@
 
 #include "ft3267.h"
 #include "esphome/core/log.h"
-#include "Wire.h"
 
 // Registers
 // Reference: https://focuslcds.com/content/FT6236.pdf
@@ -126,6 +125,12 @@ void ft3267Touchscreen::update_touches() {
 
 uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
 uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->read_byte_(id_address) >> 4; }
+
+uint8_t ft3267Touchscreen::read_byte_(uint8_t addr) {
+  uint8_t byte = 0;
+  this->read_byte(addr, &byte);
+  return byte;
+}
 
 void ft3267Touchscreen::hard_reset_() {
   if (this->reset_pin_ != nullptr) {
