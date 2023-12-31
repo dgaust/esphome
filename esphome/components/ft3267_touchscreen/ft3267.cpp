@@ -131,19 +131,15 @@ void ft3267Touchscreen::update_touches() {
 
   this->read_register(FT3267_TOUCH_POINTS, &touchregister, 1);
   this->read_register(FT3267_DEVICE_MODE, &devicemode, 1);
+  this->read_register(FT3267_GESTURE_ID, &gesture, 1);
+  
   ESP_LOGD("FT3267", "Touch: %d", &data);
   ESP_LOGD("FT3267", "Touch Count: %d", &touch_count);
   ESP_LOGD("FT3267", "Test Register: %d", &touchregister);
-  ESP_LOGD("FT3267", "Device Mode: %d", &devicemode);
-  
-  //this->read_register(FT3267_TOUCH1_XH, &x, 1); 
-  
-  //this->read_register(FT3267_TOUCH1_YH, &y, 1); 
-  
-  this->read_register(FT3267_GESTURE_ID, &gesture, 1);
-  ESP_LOGD("FT3267", "X: %d", &x);
-  ESP_LOGD("FT3267", "Y: %d", &y);
-  ESP_LOGD("FT3267", "Gesture: %d", &gesture);
+  ESP_LOGD("FT3267", "Device Mode: %d", &devicemode); 
+  ESP_LOGD("FT3267", "X: %d", x);
+  ESP_LOGD("FT3267", "Y: %d", y);
+  ESP_LOGD("FT3267", "Gesture: %d", gesture);
 }
 
 uint8_t getpositon(uint8_t *data){
