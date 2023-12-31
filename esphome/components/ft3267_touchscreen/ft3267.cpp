@@ -114,6 +114,7 @@ void ft3267Touchscreen::setup() {
 void ft3267Touchscreen::update_touches() {
   TouchPoints_t t = this->get_touches();
   if (t.size() == 0) {
+    ESP_LOGD("FT3267", "No touches");
     return;
   }
   else {
