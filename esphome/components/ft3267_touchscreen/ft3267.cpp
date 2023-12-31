@@ -110,7 +110,7 @@ void ft3267Touchscreen::setup() {
   // Get touch resolution
   this->x_raw_max_ = this->get_width_();
   this->y_raw_max_ = this->get_height_();
-
+  this->store_.touched = true;
 }
 
 void ft3267Touchscreen::update_touches() {
