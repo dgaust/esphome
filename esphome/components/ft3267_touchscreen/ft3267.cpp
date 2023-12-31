@@ -126,6 +126,7 @@ void ft3267Touchscreen::update_touches() {
   uint16_t x = this->read_touch_coordinate_(FT3267_TOUCH1_XH);
   uint16_t y = this->read_touch_coordinate_(FT3267_TOUCH1_YH);
   ESP_LOGD("FT3267", "Touch X: %d", x);
+  ESP_LOGD("FT3267", "Touch Y: %d", y);
 }
 
 uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
