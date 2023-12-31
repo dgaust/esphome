@@ -83,8 +83,6 @@ static const char *const TAG = "ft3267Touchscreen";
 #define FT3267_ID_G_FT5201ID           (0xA8)
 #define FT3267_ID_G_ERR                (0xA9)
 
-TwoWire *_Wrie = NULL;
-
 void ft3267Touchscreen::setup() {
   ESP_LOGCONFIG(TAG, "Setting up FT3267Touchscreen...");
   
@@ -115,67 +113,19 @@ void ft3267Touchscreen::setup() {
   // Set the touch resolution
   this->x_raw_max_ = this->get_width_();
   this->y_raw_max_ = this->get_height_();
-  intiatewire(*_Wrie);
-}
 
-void intiatewire(TwoWire &Wrie) {
-  _Wrie = &Wrie;
 }
 
 void ft3267Touchscreen::update_touches() {
-  uint8_t touch_id = this->read_touch_id_(FT3267_TOUCH1_EV_FLAG);  // id1 = 0 or 1
-  int touch_count = ft3267_get_touch_points_num(&touch_id);
-  ESP_LOGD("FT3267", "Touch ID: %d", touch_id);
+  int touch_count = this->read_touch_count_();
+  if (touch_count == 0) {
+    return;
+  }
   ESP_LOGD("FT3267", "Touch Count: %d", touch_count);
 }
 
-static uint8_t ft3267_get_touch_points_num(uint8_t *touch_points_num)
-{
-    return ft3267_read_byte(FT3267_TOUCH_POINTS, touch_points_num);
-}
-
-static inline uint8_t ft3267_read_byte(uint8_t reg_addr, uint8_t *data)
-{
-    // return i2c_bus_read_byte(ft3267_handle, reg_addr, data);
-    _Wrie->beginTransmission(FT3267_ADDR);
-    _Wrie->write(reg_addr);
-    _Wrie->endTransmission();
-    uint8_t bytesReceived = _Wrie->requestFrom(FT3267_ADDR, 1);
-    if (bytesReceived)
-        _Wrie->readBytes(data, bytesReceived);
-    return 0;
-}
-
-static inline uint8_t ft3267_read_bytes(uint8_t reg_addr, size_t data_len, uint8_t *data)
-{
-    // return i2c_bus_read_bytes(ft3267_handle, reg_addr, data_len, data);
-    _Wrie->beginTransmission(FT3267_ADDR);
-    _Wrie->write(reg_addr);
-    _Wrie->endTransmission();
-    uint8_t bytesReceived = _Wrie->requestFrom(FT3267_ADDR, data_len);
-    uint8_t index = 0;
-    while (_Wrie->available())
-        data[index++] = _Wrie->read();
-    return 0;
-}
-
-uint8_t ft3267_read_pos(uint8_t *touch_points_num, uint16_t *x, uint16_t *y)
-{
-    uint8_t ret_val = 0;
-    static uint8_t data[4];
-
-    ret_val |= ft3267_get_touch_points_num(touch_points_num);
-    *touch_points_num = (*touch_points_num) & 0x0f;
-    if (0 == *touch_points_num) {
-    } else {
-        ret_val |= ft3267_read_bytes(FT3267_TOUCH1_XH, 4, data);
-
-        *x = ((data[0] & 0x0f) << 8) + data[1];
-        *y = ((data[2] & 0x0f) << 8) + data[3];
-    }
-
-    return ret_val;
-}
+uint8_t ft3267Touchscreen::read_touch_count_() { return this->read_byte_(FT3267_TOUCH_POINTS); }
+uint8_t ft3267Touchscreen::read_touch_id_(uint8_t id_address) { return this->read_byte_(id_address) >> 4; }
 
 void ft3267Touchscreen::hard_reset_() {
   if (this->reset_pin_ != nullptr) {
