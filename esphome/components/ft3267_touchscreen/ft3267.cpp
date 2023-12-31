@@ -138,7 +138,7 @@ void ft3267Touchscreen::update_touches() {
   ESP_LOGD("FT3267", "Device Mode: %d", &devicemode); 
   ESP_LOGD("FT3267", "X: %d", x);
   ESP_LOGD("FT3267", "Y: %d", y);
-  ESP_LOGD("FT3267", "Gesture: %d", gesture);
+  ESP_LOGD("FT3267", "Gesture: %d", ft3267_gesture(gesture));
 }
 
 uint8_t getpositon(uint8_t *data){
