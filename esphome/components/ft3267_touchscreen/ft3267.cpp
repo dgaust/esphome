@@ -107,16 +107,16 @@ void ft3267Touchscreen::setup() {
 
   // Set the touch resolution
   this->x_raw_max_ = this->get_width_();
-  ESP_LOGD("FT3267", "Width: %d", this->x_raw_max_);
   this->y_raw_max_ = this->get_height_();
-  ESP_LOGD("FT3267", "Height: %d", this->y_raw_max_);
+  
   this->set_calibration(0, this->x_raw_max_, 0, this->y_raw_max_);
 }
 
 void ft3267Touchscreen::update_touches() {
   
   uint8_t touch_count = this->read_touch_count_();
-
+  ESP_LOGD("FT3267", "Width: %d", this->x_raw_max_);
+  ESP_LOGD("FT3267", "Height: %d", this->y_raw_max_);
   if (touch_count == 0) {
     return;
   }
