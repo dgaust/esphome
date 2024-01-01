@@ -92,16 +92,16 @@ void ft3267Touchscreen::setup() {
   this->hard_reset_();
 
   // Setup device based on ft3267 driver
-  this->write_byte(FT3267_ID_G_THGROUP, 70, false);
-  this->write_byte(FT3267_ID_G_THPEAK, 60, false);
-  this->write_byte(FT3267_ID_G_THCAL, 16, false);
-  this->write_byte(FT3267_ID_G_THWATER, 60, false);
-  this->write_byte(FT3267_ID_G_THTEMP, 10, false);
-  this->write_byte(FT3267_ID_G_THDIFF, 20, false);
-  this->write_byte(FT3267_ID_G_TIME_ENTER_MONITOR, 2, false);
-  this->write_byte(FT3267_ID_G_PERIODACTIVE, 12, false);
-  this->write_byte(FT3267_ID_G_PERIODMONITOR, 40, false);
-  this->write_byte(FT3267_ID_G_MODE, 0, false);
+  this->write_byte(FT3267_ID_G_THGROUP, 70);
+  this->write_byte(FT3267_ID_G_THPEAK, 60);
+  this->write_byte(FT3267_ID_G_THCAL, 16);
+  this->write_byte(FT3267_ID_G_THWATER, 60);
+  this->write_byte(FT3267_ID_G_THTEMP, 10);
+  this->write_byte(FT3267_ID_G_THDIFF, 20);
+  this->write_byte(FT3267_ID_G_TIME_ENTER_MONITOR, 2);
+  this->write_byte(FT3267_ID_G_PERIODACTIVE, 12);
+  this->write_byte(FT3267_ID_G_PERIODMONITOR, 40);
+  this->write_byte(FT3267_ID_G_MODE, 0);
 
   // Set the touch resolution
   this->x_raw_max_ = this->get_width_();
@@ -123,7 +123,7 @@ void ft3267Touchscreen::update_touches() {
   uint8_t y;
   uint8_t gesture;
 
-  this->write_register(FT3267_TOUCH1_XH, data, 1, false);
+  this->write_register(FT3267_TOUCH1_XH, data, 1);
   this->read_register(FT3267_TOUCH1_XH, data, 4);
   x = ((data[0] & 0x0f) << 8) + data[1];
   y = ((data[2] & 0x0f) << 8) + data[3];
