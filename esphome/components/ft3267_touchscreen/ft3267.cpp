@@ -110,8 +110,7 @@ void ft3267Touchscreen::setup() {
 }
 
 void ft3267Touchscreen::update_touches() {
-  uint8_t touch_count;
-  this->read_touch_count_(touch_count);
+  uint8_t touch_count = this->read_touch_count_(touch_count);
   
   if (touch_count == 0) {
     return;
