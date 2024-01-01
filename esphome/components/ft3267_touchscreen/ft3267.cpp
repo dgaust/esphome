@@ -123,7 +123,7 @@ void ft3267Touchscreen::update_touches() {
   uint8_t y;
   uint8_t gesture;
 
-  this->write_register(FT3267_ADDR, data, 1);
+  this->write_register(FT3267_ADDR, data, 1, false);
   this->read_register(FT3267_TOUCH1_XH, data, 4);
   x = ((data[0] & 0x0f) << 8) + data[1];
   y = ((data[2] & 0x0f) << 8) + data[3];
