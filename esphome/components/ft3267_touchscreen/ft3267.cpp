@@ -110,7 +110,7 @@ void ft3267Touchscreen::setup() {
 }
 
 void ft3267Touchscreen::update_touches() {
-  uint8_t touch_count = this->read_touch_count_(touch_count);
+  uint8_t touch_count = this->read_touch_count_();
   
   if (touch_count == 0) {
     return;
@@ -124,7 +124,7 @@ void ft3267Touchscreen::update_touches() {
   uint8_t gesture;
 
   this->write_register(FT3267_ADDR, data, 1, false);
-  this->read_register(FT3267_TOUCH1_XH, data, 4);
+  this->read_register(FT3267_TOUCH1_XH, data, 4, false);
   x = ((data[0] & 0x0f) << 8) + data[1];
   y = ((data[2] & 0x0f) << 8) + data[3];
 
@@ -144,13 +144,12 @@ void ft3267Touchscreen::update_touches() {
 }
 
 uint8_t getpositon(uint8_t *data){
-   
   return 0;
 }
 
-uint8_t ft3267Touchscreen::read_touch_count_(uint8_t points) { 
-  return this->read_register(FT3267_TOUCH_POINTS, &points, 1); 
-
+uint8_t ft3267Touchscreen::read_touch_count_() { 
+  uint8_t data;
+  return this->read_register(FT3267_TOUCH_POINTS, &data, 1, false);
 }
 
 void ft3267Touchscreen::hard_reset_() {
