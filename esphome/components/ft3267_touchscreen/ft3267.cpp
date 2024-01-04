@@ -106,12 +106,13 @@ void ft3267Touchscreen::setup() {
   // Set the touch resolution
   this->x_raw_max_ = this->get_width_();
   this->y_raw_max_ = this->get_height_();
-  this->set_calibration(0, this->x_raw_max_, 0, this->y_raw_max_);
+  // this->set_calibration(0, this->x_raw_max_, 0, this->y_raw_max_);
 }
 
 void ft3267Touchscreen::update_touches() {
   uint8_t touch_count = this->read_touch_count_();
-  
+  ESP_LOGD("FT3267", "Touch Count: %d", &touch_count);
+
   if (touch_count == 0) {
     return;
   }
@@ -135,7 +136,7 @@ void ft3267Touchscreen::update_touches() {
   this->read_register(FT3267_GESTURE_ID, &gesture, 1);
   
   ESP_LOGD("FT3267", "Touch: %d", &data);
-  ESP_LOGD("FT3267", "Touch Count: %d", &touch_count);
+  
   ESP_LOGD("FT3267", "Test Register: %d", &touchregister);
   ESP_LOGD("FT3267", "Device Mode: %d", &devicemode); 
   ESP_LOGD("FT3267", "X: %d", &x);
@@ -149,7 +150,7 @@ uint8_t getpositon(uint8_t *data){
 
 uint8_t ft3267Touchscreen::read_touch_count_() { 
   uint8_t data;
-  return this->read_register(FT3267_TOUCH_POINTS, &data, 1, false);
+  return this->read_register(FT3267_TOUCH_POINTS, &data, 1, true);
 }
 
 void ft3267Touchscreen::hard_reset_() {
