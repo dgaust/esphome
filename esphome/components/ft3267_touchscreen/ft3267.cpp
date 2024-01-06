@@ -125,7 +125,6 @@ void ft3267Touchscreen::update_touches() {
       ESP_LOGD("FT3267", "Read X: %d", x);
       ESP_LOGD("FT3267", "Read Y: %d", y);
       this->add_raw_touch_position_(id, x, y);
-      this->release_trigger_.trigger();
     }
     else
     {
