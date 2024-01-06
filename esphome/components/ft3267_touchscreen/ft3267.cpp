@@ -23,11 +23,12 @@ static const uint8_t FT3267_DEVICE_MODE = 0x00;
 static const uint8_t FT3267_GESTURE_ID = 0x01;
 static const uint8_t FT3267_TOUCH_POINTS = 0x02;
 static const uint8_t FT3267_TOUCH1_XH = 0x03;
+static const uint8_t FT3267_TOUCH1_YH = 0x05;
 ft3267_gesture gestureData;
 
 // #define FT3267_TOUCH1_XH               (0x03)
 #define FT3267_TOUCH1_XL               (0x04)
-#define FT3267_TOUCH1_YH               (0x05)
+// #define FT3267_TOUCH1_YH               (0x05)
 #define FT3267_TOUCH1_YL               (0x06)
 
 #define FT3267_TOUCH2_EV_FLAG          (0x09)
@@ -118,6 +119,12 @@ void ft3267Touchscreen::update_touches() {
     if (id == 0) {
       esphome::optional<uint8_t> touch_x = this->read_byte(FT3267_TOUCH1_XH);
       esphome::optional<uint8_t> touch_y = this->read_byte(FT3267_TOUCH1_YH);
+      uint8_t data[4];
+      this->read_bytes(FT3267_TOUCH1_XH, data, 4);
+      uint16_t x = ((data[0] & 0x0f) << 8) + data[1];
+      uint16_t y = ((data[2] & 0x0f) << 8) + data[3];
+      ESP_LOGD("FT3267", "Read X: %d", x);
+      ESP_LOGD("FT3267", "Read Y: %d", y);
       ESP_LOGD("FT3267", "Touch X: %d", touch_x.value());
       ESP_LOGD("FT3267", "Touch Y: %d", touch_y.value());
     }
