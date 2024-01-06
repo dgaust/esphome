@@ -9,8 +9,8 @@
 
 #include "esphome/components/i2c/i2c.h"
 #include "esphome/core/component.h"
-#include "esphome/components/touchscreen/touchscreen.h"
-// #include "touchscreen.h"
+//#include "esphome/components/touchscreen/touchscreen.h"
+#include "touchscreen.h"
 
 namespace esphome {
 namespace ft3267 {

@@ -105,8 +105,8 @@ void ft3267Touchscreen::setup() {
   this->write_byte(FT3267_ID_G_MODE, 0);
 
   // Set the touch resolution
-  // this->x_raw_max_ = this->get_width_();
-  // this->y_raw_max_ = this->get_height_();
+  this->x_raw_max_ = this->get_width_();
+  this->y_raw_max_ = this->get_height_();
 
 }
 
@@ -119,11 +119,14 @@ void ft3267Touchscreen::update_touches() {
     ESP_LOGD("FT3267", "Touch ID: %d", id);
     if (id == 0) {
       uint8_t data[4];
+      
       this->read_bytes(FT3267_TOUCH1_XH, data, 4);
+      
       uint16_t x = ((data[0] & 0x0f) << 8) + data[1];
       uint16_t y = ((data[2] & 0x0f) << 8) + data[3];
       ESP_LOGD("FT3267", "Read X: %d", x);
       ESP_LOGD("FT3267", "Read Y: %d", y);
+      this->add_raw_touch_position_(id, x, y);
     }
     if (id == 1) {
       uint8_t data[4];
@@ -133,14 +136,18 @@ void ft3267Touchscreen::update_touches() {
       ESP_LOGD("FT3267", "Read X: %d", x);
       ESP_LOGD("FT3267", "Read Y: %d", y);
     }
-  } 
-    this->ft2367_read_gesture(&gesture);
-    ESP_LOGD("FT3267", "Gesture: %d", gesture);
+    } 
+  esphome::optional<uint8_t> rawgesture = this->read_byte(FT3267_GESTURE_ID);
+  if (rawgesture.has_value()) {
+    gesture = (ft3267_gesture)rawgesture.value();
+    ESP_LOGD("FT3267", "Gesture X: %d", gesture);
   }
+}
 
 ft3267_gesture ft3267Touchscreen::ft2367_read_gesture(ft3267_gesture *gesture)
 {
   this->read_byte(FT3267_GESTURE_ID, (uint8_t *)gesture);
+  ESP_LOGD("FT3267", "Raw Gesture: %d", *gesture);
   return *gesture;
 }
 
