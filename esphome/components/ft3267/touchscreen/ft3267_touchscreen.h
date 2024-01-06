@@ -27,6 +27,26 @@ enum FTCmd : uint8_t {
   FT3267_TOUCH_DATA = 0x03,
   FT3267_I_MODE = 0xA4,
   FT3267_TOUCH_MAX = 0x4C,
+  FT3267_ID_G_THGROUP = 0x80,
+  FT3267_ID_G_THPEAK = 0x81,
+  FT3267_ID_G_THCAL = 0x82,
+  FT3267_ID_G_THWATER = 0x83,
+  FT3267_ID_G_THTEMP = 0x84,
+  FT3267_ID_G_THDIFF = 0x85,
+  FT3267_ID_G_TIME_ENTER_MONITOR = 0x87,
+  FT3267_ID_G_PERIODACTIVE = 0x88,
+  FT3267_ID_G_PERIODMONITOR = 0x89,
+  FT3267_ID_G_MODE = 0xA4,
+  FT3267_ID_G_AUTO_CLB_MODE = 0xA0,
+  FT3267_ID_G_LIB_VERSION_H = 0xA1,
+  FT3267_ID_G_LIB_VERSION_L = 0xA2,
+  FT3267_ID_G_CIPHER = 0xA3,
+  FT3267_ID_G_FIRMID = 0xA6,
+  FT3267_ID_G_STATE = 0xA7,
+  FT3267_ID_G_FT5201ID = 0xA8,
+  FT3267_ID_G_ERR = 0xA9,
+  FT3267_ID_G_CTRL = 0x86,
+  FT3267_ID_G_PMODE = 0xA5,
 };
 
 enum FTMode : uint8_t {
@@ -43,14 +63,15 @@ class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
     esph_log_config(TAG, "Setting up FT3267 Touchscreen...");
     // wait 200ms after reset.
     this->set_timeout(200, [this] { this->continue_setup_(); });
+    
   }
 
   void continue_setup_(void) {
-    uint8_t data[4];
+    /* uint8_t data[4];
     if (!this->set_mode_(FT3267_OP_MODE))
       return;
 
-    if (!this->err_check_(this->read_register(FT3267_VENDOR_ID_REG, data, 1), "Read Vendor ID"))
+     if (!this->err_check_(this->read_register(FT3267_VENDOR_ID_REG, data, 1), "Read Vendor ID"))
       return;
     switch (data[0]) {
       case FT3267_ID_1:
@@ -64,7 +85,38 @@ class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
         esph_log_e(TAG, "Unknown vendor ID 0x%X", data[0]);
         this->mark_failed();
         return;
-    }
+    } */
+    
+
+    this->write_byte(FT3267_ID_G_THGROUP, 70);
+
+    // valid touching peak detect threshold
+    this->write_byte(FT3267_ID_G_THPEAK, 60);
+
+    // Touch focus threshold
+    this->write_byte(FT3267_ID_G_THCAL, 16);
+
+    // threshold when there is surface water
+    this->write_byte(FT3267_ID_G_THWATER, 60);
+
+    // threshold of temperature compensation
+    this->write_byte(FT3267_ID_G_THTEMP, 10);
+
+    // Touch difference threshold
+    this->write_byte(FT3267_ID_G_THDIFF, 20);
+
+    // Delay to enter 'Monitor' status (s)
+    this->write_byte(FT3267_ID_G_TIME_ENTER_MONITOR, 2);
+
+    // Period of 'Active' status (ms)
+    this->write_byte(FT3267_ID_G_PERIODACTIVE, 12);
+
+    // Timer to enter 'idle' when in 'Monitor' (ms)
+    this->write_byte(FT3267_ID_G_PERIODMONITOR, 40);
+
+    //setting interrupt
+    this->write_byte(FT3267_ID_G_MODE, 0);
+
     // reading the chip registers to get max x/y does not seem to work.
     this->x_raw_max_ = this->display_->get_width();
     this->y_raw_max_ = this->display_->get_height();
