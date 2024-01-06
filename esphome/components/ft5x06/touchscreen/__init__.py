@@ -17,7 +17,7 @@ CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(FT5x06Touchscreen),
     }
-).extend(i2c.i2c_device_schema(0x38))
+).extend(i2c.i2c_device_schema(0x48))
 
 
 async def to_code(config):
