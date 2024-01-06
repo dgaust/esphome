@@ -111,6 +111,7 @@ void ft3267Touchscreen::setup() {
 }
 
 void ft3267Touchscreen::update_touches() {
+
   ft3267_gesture gesture = ft3267_gesture_none;
 
   esphome::optional<uint8_t> touch_id = this->read_byte(FT3267_TOUCH_POINTS);
@@ -125,9 +126,11 @@ void ft3267Touchscreen::update_touches() {
       ESP_LOGD("FT3267", "Read X: %d", x);
       ESP_LOGD("FT3267", "Read Y: %d", y);
       this->add_raw_touch_position_(id, x, y);
+
     }
     else
     {
+      this->touch_trigger_.stop_action();
       this->release_trigger_.stop_action();
     }
     /* if (id == 1) {
