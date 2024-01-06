@@ -23,6 +23,7 @@ static const uint8_t FT3267_DEVICE_MODE = 0x00;
 static const uint8_t FT3267_GESTURE_ID = 0x01;
 static const uint8_t FT3267_TOUCH_POINTS = 0x02;
 static const uint8_t FT3267_TOUCH1_XH = 0x03;
+static const uint8_t FT3267_TOUCH1_XL = 0x04;
 static const uint8_t FT3267_TOUCH1_YH = 0x05;
 ft3267_gesture gestureData;
 
@@ -128,20 +129,20 @@ void ft3267Touchscreen::update_touches() {
       this->add_raw_touch_position_(id, x, y);
 
     }
+    else if (id == 1) {
+      uint8_t data[4];
+      this->read_bytes(FT3267_TOUCH1_XL, data, 4);
+      uint16_t x = ((data[0] & 0x0f) << 8) + data[1];
+      uint16_t y = ((data[2] & 0x0f) << 8) + data[3];
+      ESP_LOGD("FT3267", "Read X: %d", x);
+      ESP_LOGD("FT3267", "Read Y: %d", y);
+    }
     else
     {
       this->touch_trigger_.stop_action();
       this->release_trigger_.stop_action();
     }
-    /* if (id == 1) {
-      uint8_t data[4];
-      this->read_bytes(FT3267_TOUCH2_XH, data, 4);
-      uint16_t x = ((data[0] & 0x0f) << 8) + data[1];
-      uint16_t y = ((data[2] & 0x0f) << 8) + data[3];
-      ESP_LOGD("FT3267", "Read X: %d", x);
-      ESP_LOGD("FT3267", "Read Y: %d", y);
-    } */
-    } 
+  } 
   esphome::optional<uint8_t> rawgesture = this->read_byte(FT3267_GESTURE_ID);
   if (rawgesture.has_value()) {
     gesture = (ft3267_gesture)rawgesture.value();
