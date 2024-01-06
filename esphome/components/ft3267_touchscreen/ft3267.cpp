@@ -118,24 +118,27 @@ void ft3267Touchscreen::update_touches() {
     uint8_t id = touch_id.value();
     ESP_LOGD("FT3267", "Touch ID: %d", id);
     if (id == 0) {
-      uint8_t data[4];
-      
+      uint8_t data[4];  
       this->read_bytes(FT3267_TOUCH1_XH, data, 4);
-      
       uint16_t x = ((data[0] & 0x0f) << 8) + data[1];
       uint16_t y = ((data[2] & 0x0f) << 8) + data[3];
       ESP_LOGD("FT3267", "Read X: %d", x);
       ESP_LOGD("FT3267", "Read Y: %d", y);
       this->add_raw_touch_position_(id, x, y);
+      this->release_trigger_.trigger();
     }
-    if (id == 1) {
+    else
+    {
+      this->release_trigger_.stop_action();
+    }
+    /* if (id == 1) {
       uint8_t data[4];
       this->read_bytes(FT3267_TOUCH2_XH, data, 4);
       uint16_t x = ((data[0] & 0x0f) << 8) + data[1];
       uint16_t y = ((data[2] & 0x0f) << 8) + data[3];
       ESP_LOGD("FT3267", "Read X: %d", x);
       ESP_LOGD("FT3267", "Read Y: %d", y);
-    }
+    } */
     } 
   esphome::optional<uint8_t> rawgesture = this->read_byte(FT3267_GESTURE_ID);
   if (rawgesture.has_value()) {
