@@ -114,6 +114,8 @@ void ft3267Touchscreen::setup() {
 void ft3267Touchscreen::update_touches() {
   ft3267_gesture gesture = ft3267_gesture_none;
   esphome::optional<uint8_t> touch_id = this->read_byte(FT3267_TOUCH_POINTS);
+  esphome::optional<uint8_t> device_mode = this->read_byte(FT3267_DEVICE_MODE);
+  ESP_LOGD("FT3267", "Device Mode: %d", device_mode.value());
   if (touch_id.has_value()) {
     uint8_t id = touch_id.value() & 0x0f;
     ESP_LOGD("FT3267", "Touch ID: %d", id);
