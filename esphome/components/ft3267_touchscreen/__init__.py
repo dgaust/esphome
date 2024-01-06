@@ -44,4 +44,4 @@ async def to_code(config):
         reset_pin = await cg.gpio_pin_expression(reset_pin_config)
         cg.add(var.set_reset_pin(reset_pin))
     if CONF_ADDRESS in config:
-        cg.add(var.set_address(config[CONF_ADDRESS]))
+        cg.add(var.set_i2c_address(config[CONF_ADDRESS]))
