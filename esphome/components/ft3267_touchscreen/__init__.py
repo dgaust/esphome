@@ -15,8 +15,8 @@ ft3267Touchscreen = ft3267_ns.class_(
     i2c.I2CDevice,
 )
 
-CONF_FT63X6_ID = "ft3267_id"
-
+CONF_FT3267_ID = "ft3267_id"
+CONF_ADDRESS = "address"
 
 CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend(
     cv.Schema(
@@ -25,9 +25,10 @@ CONFIG_SCHEMA = touchscreen.TOUCHSCREEN_SCHEMA.extend(
             cv.Optional(CONF_INTERRUPT_PIN): cv.All(
                 pins.internal_gpio_input_pin_schema
             ),
+            cv.Optional(CONF_ADDRESS, default=0x38): cv.i2c_address,
             cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
         }
-    ).extend(i2c.i2c_device_schema(0x38))
+    ).extend(i2c.i2c_device_schema(CONF_ADDRESS))
 )
 
 
@@ -42,3 +43,5 @@ async def to_code(config):
     if reset_pin_config := config.get(CONF_RESET_PIN):
         reset_pin = await cg.gpio_pin_expression(reset_pin_config)
         cg.add(var.set_reset_pin(reset_pin))
+    if CONF_ADDRESS in config:
+        cg.add(var.set_address(config[CONF_ADDRESS]))
