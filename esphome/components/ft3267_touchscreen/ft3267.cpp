@@ -111,14 +111,17 @@ void ft3267Touchscreen::setup() {
 
 void ft3267Touchscreen::update_touches() {
   uint8_t gesture = 0;
-  esphome::optional<uint8_t> touch_count = this->read_byte(FT3267_TOUCH_POINTS);
-  if (touch_count.has_value()) {
-    uint8_t count = touch_count.value();
-    ESP_LOGD("FT3267", "Touch Count: %d", count);
-    if (count == 0) {
-      return;
+  esphome::optional<uint8_t> touch_id = this->read_byte(FT3267_TOUCH_POINTS);
+  if (touch_id.has_value()) {
+    uint8_t id = touch_id.value();
+    ESP_LOGD("FT3267", "Touch ID: %d", id);
+    if (id == 0) {
+      esphome::optional<uint8_t> touch_x = this->read_byte(FT3267_TOUCH1_XH);
+      esphome::optional<uint8_t> touch_y = this->read_byte(FT3267_TOUCH1_YH);
+      ESP_LOGD("FT3267", "Touch X: %d", touch_x.value());
+      ESP_LOGD("FT3267", "Touch Y: %d", touch_y.value());
     }
-  }
+  } 
   gesture = this->read_byte(FT3267_GESTURE_ID, &gesture);
   ESP_LOGD("FT3267", "Gesture: %d", gesture);
 }
