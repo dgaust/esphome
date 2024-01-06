@@ -127,15 +127,16 @@ void ft3267Touchscreen::update_touches() {
       ESP_LOGD("FT3267", "Read X: %d", x);
       ESP_LOGD("FT3267", "Read Y: %d", y);
       this->add_raw_touch_position_(id, x, y);
-
+      this->send_touches_();
     }
     else if (id == 1) {
       uint8_t data[4];
-      this->read_bytes(FT3267_TOUCH1_XL, data, 4);
+      this->read_bytes(FT3267_TOUCH1_YH, data, 4);
       uint16_t x = ((data[0] & 0x0f) << 8) + data[1];
       uint16_t y = ((data[2] & 0x0f) << 8) + data[3];
       ESP_LOGD("FT3267", "Read X: %d", x);
       ESP_LOGD("FT3267", "Read Y: %d", y);
+      
     }
     else
     {
