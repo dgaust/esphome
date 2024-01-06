@@ -128,7 +128,7 @@ void ft3267Touchscreen::update_touches() {
     }
     else if (id == 1) {
       uint8_t data[4];
-      this->read_bytes(FT3267_TOUCH1_YH, data, 4);
+      this->read_bytes(FT3267_TOUCH2_XH, data, 4);
       uint16_t x = ((data[0] & 0x0f) << 8) + data[1];
       uint16_t y = ((data[2] & 0x0f) << 8) + data[3];
       ESP_LOGD("FT3267", "Read X: %d", x);
