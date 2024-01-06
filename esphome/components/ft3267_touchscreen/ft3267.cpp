@@ -140,11 +140,8 @@ void ft3267Touchscreen::update_touches() {
       this->release_trigger_.stop_action();
     }
   } 
-  esphome::optional<uint8_t> rawgesture = this->read_byte(FT3267_GESTURE_ID);
-  if (rawgesture.has_value()) {
-    gesture = (ft3267_gesture)rawgesture.value();
-    ESP_LOGD("FT3267", "Gesture X: %d", rawgesture.value());
-  }
+  gesture = this->ft3267_read_gesture();
+  ESP_LOGD("FT3267", "Gesture: %d", gesture);
 }
 
 ft3267_gesture ft3267Touchscreen::ft3267_read_gesture()
