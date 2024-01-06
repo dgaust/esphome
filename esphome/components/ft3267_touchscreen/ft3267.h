@@ -42,8 +42,7 @@ class ft3267Touchscreen : public Touchscreen, public i2c::I2CDevice {
   InternalGPIOPin *interrupt_pin_{nullptr};
   GPIOPin *reset_pin_{nullptr};
 
-
-  uint8_t read_touch_count_();
+  ft3267_gesture ft2367_read_gesture(ft3267_gesture *gesture);
 };
 
 
