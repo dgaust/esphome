@@ -7,9 +7,9 @@
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace ft5x06 {
+namespace ft3267 {
 
-static const char *const TAG = "ft5x06.touchscreen";
+static const char *const TAG = "ft3267.touchscreen";
 
 enum VendorId {
   FT5X06_ID_UNKNOWN = 0,
@@ -37,10 +37,10 @@ enum FTMode : uint8_t {
 
 static const size_t MAX_TOUCHES = 5;  // max number of possible touches reported
 
-class FT5x06Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice {
+class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice {
  public:
   void setup() override {
-    esph_log_config(TAG, "Setting up FT5x06 Touchscreen...");
+    esph_log_config(TAG, "Setting up FT3267 Touchscreen...");
     // wait 200ms after reset.
     this->set_timeout(200, [this] { this->continue_setup_(); });
   }
@@ -68,7 +68,7 @@ class FT5x06Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
     // reading the chip registers to get max x/y does not seem to work.
     this->x_raw_max_ = this->display_->get_width();
     this->y_raw_max_ = this->display_->get_height();
-    esph_log_config(TAG, "FT5x06 Touchscreen setup complete");
+    esph_log_config(TAG, "FT3267 Touchscreen setup complete");
   }
 
   void update_touches() override {
@@ -100,7 +100,7 @@ class FT5x06Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
   }
 
   void dump_config() override {
-    esph_log_config(TAG, "FT5x06 Touchscreen:");
+    esph_log_config(TAG, "FT3267 Touchscreen:");
     esph_log_config(TAG, "  Address: 0x%02X", this->address_);
     esph_log_config(TAG, "  Vendor ID: 0x%X", (int) this->vendor_id_);
   }
