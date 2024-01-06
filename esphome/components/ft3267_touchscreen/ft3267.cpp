@@ -147,11 +147,13 @@ void ft3267Touchscreen::update_touches() {
   }
 }
 
-ft3267_gesture ft3267Touchscreen::ft2367_read_gesture(ft3267_gesture *gesture)
+ft3267_gesture ft3267Touchscreen::ft3267_read_gesture()
 {
-  this->read_byte(FT3267_GESTURE_ID, (uint8_t *)gesture);
-  ESP_LOGD("FT3267", "Raw Gesture: %d", *gesture);
-  return *gesture;
+    uint8_t gesture_byte;
+    this->read_byte(FT3267_GESTURE_ID, &gesture_byte);
+
+    // Assuming the byte read directly corresponds to the enum values
+    return (ft3267_gesture)gesture_byte;
 }
 
 uint8_t getpositon(uint8_t *data){
