@@ -12,27 +12,27 @@ namespace ft3267 {
 static const char *const TAG = "ft3267.touchscreen";
 
 enum VendorId {
-  FT5X06_ID_UNKNOWN = 0,
-  FT5X06_ID_1 = 0x51,
-  FT5X06_ID_2 = 0x11,
-  FT5X06_ID_3 = 0xCD,
+  FT3267_ID_UNKNOWN = 0,
+  FT3267_ID_1 = 0x51,
+  FT3267_ID_2 = 0x11,
+  FT3267_ID_3 = 0xCD,
 };
 
 enum FTCmd : uint8_t {
-  FT5X06_MODE_REG = 0x00,
-  FT5X06_ORIGIN_REG = 0x08,
-  FT5X06_RESOLUTION_REG = 0x0C,
-  FT5X06_VENDOR_ID_REG = 0xA8,
-  FT5X06_TD_STATUS = 0x02,
-  FT5X06_TOUCH_DATA = 0x03,
-  FT5X06_I_MODE = 0xA4,
-  FT5X06_TOUCH_MAX = 0x4C,
+  FT3267_MODE_REG = 0x00,
+  FT3267_ORIGIN_REG = 0x08,
+  FT3267_RESOLUTION_REG = 0x0C,
+  FT3267_VENDOR_ID_REG = 0xA8,
+  FT3267_TD_STATUS = 0x02,
+  FT3267_TOUCH_DATA = 0x03,
+  FT3267_I_MODE = 0xA4,
+  FT3267_TOUCH_MAX = 0x4C,
 };
 
 enum FTMode : uint8_t {
-  FT5X06_OP_MODE = 0,
-  FT5X06_SYSINFO_MODE = 0x10,
-  FT5X06_TEST_MODE = 0x40,
+  FT3267_OP_MODE = 0,
+  FT3267_SYSINFO_MODE = 0x10,
+  FT3267_TEST_MODE = 0x40,
 };
 
 static const size_t MAX_TOUCHES = 5;  // max number of possible touches reported
@@ -47,15 +47,15 @@ class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
 
   void continue_setup_(void) {
     uint8_t data[4];
-    if (!this->set_mode_(FT5X06_OP_MODE))
+    if (!this->set_mode_(FT3267_OP_MODE))
       return;
 
-    if (!this->err_check_(this->read_register(FT5X06_VENDOR_ID_REG, data, 1), "Read Vendor ID"))
+    if (!this->err_check_(this->read_register(FT3267_VENDOR_ID_REG, data, 1), "Read Vendor ID"))
       return;
     switch (data[0]) {
-      case FT5X06_ID_1:
-      case FT5X06_ID_2:
-      case FT5X06_ID_3:
+      case FT3267_ID_1:
+      case FT3267_ID_2:
+      case FT3267_ID_3:
         this->vendor_id_ = (VendorId) data[0];
         esph_log_d(TAG, "Read vendor ID 0x%X", data[0]);
         break;
@@ -75,14 +75,14 @@ class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
     uint8_t touch_cnt;
     uint8_t data[MAX_TOUCHES][6];
 
-    if (!this->read_byte(FT5X06_TD_STATUS, &touch_cnt) || touch_cnt > MAX_TOUCHES) {
+    if (!this->read_byte(FT3267_TD_STATUS, &touch_cnt) || touch_cnt > MAX_TOUCHES) {
       esph_log_w(TAG, "Failed to read status");
       return;
     }
     if (touch_cnt == 0)
       return;
 
-    if (!this->read_bytes(FT5X06_TOUCH_DATA, (uint8_t *) data, touch_cnt * 6)) {
+    if (!this->read_bytes(FT3267_TOUCH_DATA, (uint8_t *) data, touch_cnt * 6)) {
       esph_log_w(TAG, "Failed to read touch data");
       return;
     }
@@ -115,10 +115,10 @@ class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
     return true;
   }
   bool set_mode_(FTMode mode) {
-    return this->err_check_(this->write_register(FT5X06_MODE_REG, (uint8_t *) &mode, 1), "Set mode");
+    return this->err_check_(this->write_register(FT3267_MODE_REG, (uint8_t *) &mode, 1), "Set mode");
   }
-  VendorId vendor_id_{FT5X06_ID_UNKNOWN};
+  VendorId vendor_id_{FT3267_ID_UNKNOWN};
 };
 
-}  // namespace ft5x06
+}  // namespace FT3267
 }  // namespace esphome
