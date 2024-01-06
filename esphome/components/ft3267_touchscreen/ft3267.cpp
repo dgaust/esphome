@@ -104,42 +104,19 @@ void ft3267Touchscreen::setup() {
   this->write_byte(FT3267_ID_G_MODE, 0);
 
   // Set the touch resolution
-  this->x_raw_max_ = this->get_width_();
-  this->y_raw_max_ = this->get_height_();
-  // this->set_calibration(0, this->x_raw_max_, 0, this->y_raw_max_);
+  // this->x_raw_max_ = this->get_width_();
+  // this->y_raw_max_ = this->get_height_();
+
 }
 
 void ft3267Touchscreen::update_touches() {
   uint8_t touch_count = this->read_touch_count_();
   ESP_LOGD("FT3267", "Touch Count: %d", &touch_count);
-
   if (touch_count == 0) {
     return;
   }
-  
-  uint8_t touchregister;
-  uint8_t devicemode;
-  static uint8_t data[4];
-  uint8_t x;
-  uint8_t y;
   uint8_t gesture;
-
-  this->read_register(FT3267_TOUCH1_XH, data, 4, false);
-  x = ((data[0] & 0x0f) << 8) + data[1];
-  y = ((data[2] & 0x0f) << 8) + data[3];
-
-  this->read_register(FT3267_TOUCH_POINTS, &touchregister, 1);
-  this->read_byte(FT3267_TOUCH_POINTS, &touch_count);
-  this->read_byte(FT3267_DEVICE_MODE, &devicemode);
-  // this->read_register(FT3267_DEVICE_MODE, &devicemode, 1);
   this->read_register(FT3267_GESTURE_ID, &gesture, 1);
-  
-  ESP_LOGD("FT3267", "Touch: %d", &data);
-  
-  ESP_LOGD("FT3267", "Test Register: %d", &touchregister);
-  ESP_LOGD("FT3267", "Device Mode: %d", &devicemode); 
-  ESP_LOGD("FT3267", "X: %d", &x);
-  ESP_LOGD("FT3267", "Y: %d", &y);
   ESP_LOGD("FT3267", "Gesture: %d", &gesture);
 }
 
