@@ -147,8 +147,7 @@ void ft3267Touchscreen::update_touches() {
 ft3267_gesture ft3267Touchscreen::ft3267_read_gesture()
 {
     uint8_t gesture_byte;
-    this->write_byte(FT3267_GESTURE_ID, 0x18);
-    this->read_byte(FT3267_GESTURE_ID, &gesture_byte);
+    this->read_register(FT3267_GESTURE_ID, &gesture_byte, 1); // Add the missing argument for the number of bytes to read
 
     // Assuming the byte read directly corresponds to the enum values
     return (ft3267_gesture)gesture_byte;
