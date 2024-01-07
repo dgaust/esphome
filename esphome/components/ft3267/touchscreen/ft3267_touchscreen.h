@@ -56,6 +56,7 @@ enum FTMode : uint8_t {
 };
 
 static const size_t MAX_TOUCHES = 5;  // max number of possible touches reported
+static const uint8_t thgroup = 70;
 
 class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice {
  public:
@@ -70,7 +71,7 @@ class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
     
     this->read_register(FT3267_ID_G_FT5201ID, (uint8_t *) &this->vendor_id_, 1);
     esph_log_d(TAG, "Read vendor ID 0x%X", this->vendor_id_);
-    this->write_byte(FT3267_ID_G_THGROUP, 70);
+    this->write_register(FT3267_ID_G_THGROUP, &thgroup, 1);
 
     // valid touching peak detect threshold
     this->write_byte(FT3267_ID_G_THPEAK, 60);
