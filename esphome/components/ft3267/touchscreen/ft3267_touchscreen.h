@@ -67,25 +67,6 @@ class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
   }
 
   void continue_setup_(void) {
-    /* uint8_t data[4];
-    if (!this->set_mode_(FT3267_OP_MODE))
-      return;
-
-     if (!this->err_check_(this->read_register(FT3267_VENDOR_ID_REG, data, 1), "Read Vendor ID"))
-      return;
-    switch (data[0]) {
-      case FT3267_ID_1:
-      case FT3267_ID_2:
-      case FT3267_ID_3:
-        this->vendor_id_ = (VendorId) data[0];
-        esph_log_d(TAG, "Read vendor ID 0x%X", data[0]);
-        break;
-
-      default:
-        esph_log_e(TAG, "Unknown vendor ID 0x%X", data[0]);
-        this->mark_failed();
-        return;
-    } */
     
     this->read_register(FT3267_ID_G_FT5201ID, (uint8_t *) &this->vendor_id_, 1);
     esph_log_d(TAG, "Read vendor ID 0x%X", this->vendor_id_);
