@@ -57,6 +57,15 @@ enum FTMode : uint8_t {
 
 static const size_t MAX_TOUCHES = 5;  // max number of possible touches reported
 static const uint8_t thgroup = 70;
+static const uint8_t thpeak = 60;
+static const uint8_t thcal = 16;
+static const uint8_t thwater = 60;
+static const uint8_t thtemp = 10;
+static const uint8_t thdiff = 20;
+static const uint8_t time_enter_monitor = 2;
+static const uint8_t periodactive = 12;
+static const uint8_t periodmonitor = 40;
+static const uint8_t mode = 0;
 
 class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice {
  public:
@@ -71,34 +80,27 @@ class FT3267Touchscreen : public touchscreen::Touchscreen, public i2c::I2CDevice
     
     this->read_register(FT3267_ID_G_FT5201ID, (uint8_t *) &this->vendor_id_, 1);
     esph_log_d(TAG, "Read vendor ID 0x%X", this->vendor_id_);
+    
+    
     this->write_register(FT3267_ID_G_THGROUP, &thgroup, 1);
-
     // valid touching peak detect threshold
-    this->write_byte(FT3267_ID_G_THPEAK, 60);
-
+    this->write_register(FT3267_ID_G_THPEAK, &thpeak, 1);
     // Touch focus threshold
-    this->write_byte(FT3267_ID_G_THCAL, 16);
-
+    this->write_register(FT3267_ID_G_THCAL, &thcal, 1);
     // threshold when there is surface water
-    this->write_byte(FT3267_ID_G_THWATER, 60);
-
+    this->write_register(FT3267_ID_G_THWATER, &thwater, 1);
     // threshold of temperature compensation
-    this->write_byte(FT3267_ID_G_THTEMP, 10);
-
+    this->write_register(FT3267_ID_G_THTEMP, &thtemp, 1);
     // Touch difference threshold
-    this->write_byte(FT3267_ID_G_THDIFF, 20);
-
+    this->write_register(FT3267_ID_G_THDIFF, &thdiff, 1);
     // Delay to enter 'Monitor' status (s)
-    this->write_byte(FT3267_ID_G_TIME_ENTER_MONITOR, 2);
-
+    this->write_register(FT3267_ID_G_TIME_ENTER_MONITOR, &time_enter_monitor, 1);
     // Period of 'Active' status (ms)
-    this->write_byte(FT3267_ID_G_PERIODACTIVE, 12);
-
+    this->write_register(FT3267_ID_G_PERIODACTIVE, &periodactive, 1);
     // Timer to enter 'idle' when in 'Monitor' (ms)
-    this->write_byte(FT3267_ID_G_PERIODMONITOR, 40);
-
+    this->write_register(FT3267_ID_G_PERIODMONITOR, &periodmonitor, 1);
     //setting interrupt
-    this->write_byte(FT3267_ID_G_MODE, 0);
+    this->write_register(FT3267_ID_G_MODE, &mode, 1);
 
     // reading the chip registers to get max x/y does not seem to work.
     this->x_raw_max_ = this->display_->get_width();
