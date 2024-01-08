@@ -42,7 +42,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_HEIGHT, default=240): cv.int_,
             cv.Optional(CONF_OFFSET_Y, default=0): cv.int_,
             cv.Optional(CONF_OFFSET_X, default=0): cv.int_,
-            cv.Optional(CONF_EIGHT_BIT_COLOR, default=True): cv.boolean,
+            cv.Optional(CONF_EIGHT_BIT_COLOR, default=False): cv.boolean,
         }
     )
     .extend(cv.COMPONENT_SCHEMA)
