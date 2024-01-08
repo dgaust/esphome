@@ -23,19 +23,15 @@ CONF_OFFSET_Y = "offset_y"
 CONF_EIGHT_BIT_COLOR = "eight_bit_color"
 
 gc9a01_ns = cg.esphome_ns.namespace("gc9a01")
-#SPIGC9A01 = gc9a01_ns.class_(
-#    "GC9A01", cg.PollingComponent, display.DisplayBuffer, spi.SPIDevice
-#)
-
 SPIGC9A01 = gc9a01_ns.class_(
-    "GC9A01", display.DisplayBuffer, spi.SPIDevice, cg.PollingComponent
+    "GC9A01", cg.PollingComponent, display.DisplayBuffer, spi.SPIDevice
 )
 
 GC9A01_SCHEMA = display.FULL_DISPLAY_SCHEMA.extend(
     {
         cv.Optional(CONF_RESET_PIN): pins.gpio_output_pin_schema,
     }
-).extend(cv.polling_component_schema("1s"))
+).extend(cv.polling_component_schema("5s"))
 
 CONFIG_SCHEMA = cv.All(
     GC9A01_SCHEMA.extend(
@@ -56,7 +52,6 @@ CONFIG_SCHEMA = cv.All(
 
 
 async def setup_gc9a01(var, config):
-    # await cg.register_component(var, config)
     await display.register_display(var, config)
 
     if CONF_RESET_PIN in config:
@@ -67,7 +62,6 @@ async def setup_gc9a01(var, config):
             config[CONF_LAMBDA], [(display.DisplayRef, "it")], return_type=cg.void
         )
         cg.add(var.set_writer(lambda_))
-
 
 async def to_code(config):
     var = cg.new_Pvariable(
